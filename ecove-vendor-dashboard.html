@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechHub Lagos – Vendor Dashboard | Ecove Marketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary:#f68b1f; --primary-dark:#d4720e; --primary-light:#fff4e6; --primary-xlight:#fffaf5;
+      --green:#1e8a44; --green-light:#e8f7ef;
+      --red:#e53935; --red-light:#ffeaea;
+      --blue:#1976d2; --blue-light:#e3f2fd;
+      --yellow:#f59e0b; --yellow-light:#fef3c7;
+      --purple:#7c3aed; --purple-light:#ede9fe;
+      --sidebar-bg:#1a1a1a;
+      --bg:#f5f5f5; --white:#fff; --border:#e5e7eb;
+      --text:#313131; --muted:#888;
+      --shadow:0 1px 8px rgba(0,0,0,.08); --shadow-md:0 4px 20px rgba(0,0,0,.12);
+      --radius:10px; --sidebar-w:240px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+    button{cursor:pointer;border:none;background:none;font-family:inherit;}
+
+    /* SIDEBAR */
+    aside{width:var(--sidebar-w);background:var(--sidebar-bg);min-height:100vh;display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:200;transition:transform .3s;}
+    aside.closed{transform:translateX(-100%);}
+    .sidebar-logo{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.07);}
+    .logo-brand{font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;}
+    .logo-name{font-size:18px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;}
+    .logo-name .dot{width:8px;height:8px;border-radius:50%;background:var(--primary);}
+    .logo-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(30,138,68,.2);color:#4ade80;margin-top:6px;font-weight:600;}
+    .sidebar-nav{flex:1;overflow-y:auto;padding:10px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent;}
+    .nav-section{padding:14px 18px 5px;font-size:9.5px;font-weight:700;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:1.8px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;color:rgba(255,255,255,.65);cursor:pointer;font-size:13px;font-weight:500;margin:1px 8px;border-radius:8px;transition:all .15s;}
+    .nav-item:hover{background:rgba(246,139,31,.12);color:#fff;}
+    .nav-item.active{background:var(--primary);color:#fff;}
+    .nav-icon{font-size:15px;width:20px;text-align:center;}
+    .nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;}
+    .sidebar-footer{padding:14px;border-top:1px solid rgba(255,255,255,.07);}
+    .vendor-profile{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer;transition:background .15s;}
+    .vendor-profile:hover{background:rgba(246,139,31,.12);}
+    .v-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:14px;flex-shrink:0;}
+    .v-name{font-size:13px;font-weight:600;color:#fff;}
+    .v-id{font-size:11px;color:rgba(255,255,255,.35);}
+
+    /* OVERLAY */
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199;}
+    .sidebar-overlay.show{display:block;}
+
+    /* MAIN */
+    .main-content{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;}
+
+    /* TOPBAR */
+    .topbar{background:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);position:sticky;top:0;z-index:100;gap:12px;}
+    .topbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
+    .hamburger{display:none;width:36px;height:36px;border-radius:8px;border:1px solid var(--border);align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0;}
+    .page-title{font-size:17px;font-weight:700;}
+    .page-subtitle{font-size:11.5px;color:var(--muted);margin-top:1px;}
+    .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .tb-btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;white-space:nowrap;}
+    .tb-btn.primary{background:var(--primary);color:#fff;border:none;}
+    .tb-btn.primary:hover{background:var(--primary-dark);}
+    .tb-btn.outline{background:#fff;color:var(--text);border:1px solid var(--border);}
+    .tb-btn.outline:hover{border-color:var(--primary);color:var(--primary-dark);}
+    .tb-btn.success{background:var(--green);color:#fff;border:none;}
+    .notif-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;background:#fff;font-size:16px;position:relative;cursor:pointer;}
+    .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;}
+
+    /* CONTENT */
+    .page-content{padding:20px 24px;flex:1;}
+    .vendor-page{display:none;}
+    .vendor-page.active{display:block;}
+
+    /* NOTICE BANNER */
+    .notice{padding:12px 16px;border-radius:8px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
+    .notice.warning{background:var(--yellow-light);border-left:3px solid var(--yellow);}
+    .notice.info{background:var(--blue-light);border-left:3px solid var(--blue);}
+    .notice.success{background:var(--green-light);border-left:3px solid var(--green);}
+    .notice-icon{font-size:16px;flex-shrink:0;}
+    .notice-text{font-size:13px;line-height:1.5;}
+    .notice-text strong{font-weight:700;}
+
+    /* STATS */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+    .stat-card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);display:flex;align-items:flex-start;gap:12px;transition:transform .2s;}
+    .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+    .stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+    .si-orange{background:var(--primary-light);}
+    .si-green{background:var(--green-light);}
+    .si-blue{background:var(--blue-light);}
+    .si-purple{background:var(--purple-light);}
+    .si-red{background:var(--red-light);}
+    .si-yellow{background:var(--yellow-light);}
+    .stat-label{font-size:11.5px;color:var(--muted);font-weight:500;margin-bottom:3px;}
+    .stat-value{font-size:22px;font-weight:800;}
+    .stat-change{font-size:11px;font-weight:500;}
+    .stat-change.up{color:var(--green);}
+    .stat-change.down{color:var(--red);}
+
+    /* LAYOUTS */
+    .two-col{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px;}
+    .two-col-eq{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+    .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px;}
+
+    /* CARDS */
+    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px;}
+    .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .card-title{font-size:14px;font-weight:700;}
+    .card-body{padding:20px;}
+
+    /* TABLE */
+    .table-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;min-width:500px;}
+    th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:#fafafa;white-space:nowrap;}
+    td{padding:13px 14px;font-size:13px;border-bottom:1px solid #f5f5f5;vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#fffaf5;}
+    .td-product{display:flex;align-items:center;gap:10px;}
+    .td-thumb{width:38px;height:38px;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .td-name{font-weight:600;font-size:13px;}
+    .td-sub{font-size:11px;color:var(--muted);}
+
+    /* BADGES */
+    .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+    .badge-success{background:#dcfce7;color:#15803d;}
+    .badge-warning{background:#fef3c7;color:#92400e;}
+    .badge-danger{background:#fee2e2;color:#991b1b;}
+    .badge-info{background:#dbeafe;color:#1e40af;}
+    .badge-orange{background:var(--primary-light);color:var(--primary-dark);}
+    .badge-gray{background:#f3f4f6;color:#374151;}
+
+    /* ACTIONS */
+    .action-btn{padding:5px 10px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:inherit;white-space:nowrap;}
+    .action-edit{background:var(--primary-light);color:var(--primary-dark);}
+    .action-edit:hover{background:var(--primary);color:#fff;}
+    .action-view{background:#dbeafe;color:#1e40af;}
+    .action-view:hover{background:#1e40af;color:#fff;}
+    .action-delete{background:#fee2e2;color:#991b1b;}
+    .action-delete:hover{background:#991b1b;color:#fff;}
+
+    /* FORMS */
+    .form-group{margin-bottom:15px;}
+    .form-group label{display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;}
+    .form-group .hint{font-size:11px;color:var(--muted);margin-top:4px;}
+    input[type=text],input[type=email],input[type=number],input[type=tel],select,textarea{
+      width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;
+      font-size:13px;font-family:inherit;outline:none;color:var(--text);
+      transition:border-color .2s;
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(246,139,31,.1);}
+    textarea{resize:vertical;min-height:90px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+    /* UPLOAD */
+    .upload-area{border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;}
+    .upload-area:hover{border-color:var(--primary);background:var(--primary-xlight);}
+    .upload-icon{font-size:32px;margin-bottom:8px;}
+    .upload-text{font-size:13px;font-weight:500;margin-bottom:3px;}
+    .upload-hint{font-size:11px;color:var(--muted);}
+    .img-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
+    .img-slot{aspect-ratio:1;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;transition:all .2s;}
+    .img-slot:hover{border-color:var(--primary);background:var(--primary-xlight);}
+    .img-slot.filled{border-style:solid;border-color:var(--primary);background:var(--primary-xlight);}
+
+    /* TOGGLE */
+    .toggle{display:flex;align-items:center;gap:10px;cursor:pointer;}
+    .toggle-track{width:42px;height:22px;border-radius:11px;background:#d1d5db;position:relative;transition:background .2s;flex-shrink:0;}
+    .toggle-track.on{background:var(--primary);}
+    .toggle-thumb{width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+    .toggle-track.on .toggle-thumb{left:22px;}
+    .toggle-label{font-size:13px;font-weight:500;}
+
+    /* TABS */
+    .tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:18px;overflow-x:auto;scrollbar-width:none;}
+    .tabs::-webkit-scrollbar{display:none;}
+    .tab{padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
+    .tab.active{color:var(--primary-dark);border-bottom-color:var(--primary);}
+
+    /* CHARTS */
+    .chart-bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px;}
+    .bar-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+    .bar{width:100%;border-radius:4px 4px 0 0;background:var(--primary);opacity:.85;transition:height .5s;cursor:pointer;}
+    .bar:hover{opacity:1;}
+    .bar-label{font-size:10px;color:var(--muted);}
+    .bar-val{font-size:9px;font-weight:600;color:var(--text);}
+
+    /* PROGRESS */
+    .progress-bar{height:7px;background:#f0f0f0;border-radius:4px;overflow:hidden;}
+    .progress-fill{height:100%;border-radius:4px;background:var(--primary);}
+
+    /* QS STRIP */
+    .qs-strip{display:flex;gap:12px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px;}
+    .qs-item{flex:1;min-width:120px;background:#fff;border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+    .qs-val{font-size:20px;font-weight:800;}
+    .qs-lbl{font-size:11px;color:var(--muted);}
+
+    /* FILTER ROW */
+    .filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+    .filter-row select,.filter-row input{width:auto;padding:8px 12px;}
+    .search-wrap{position:relative;}
+    .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;}
+    .search-wrap input{padding-left:34px;width:200px;}
+
+    /* PAGINATION */
+    .pagination{display:flex;align-items:center;gap:5px;padding-top:14px;border-top:1px solid var(--border);}
+    .page-btn{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;}
+    .page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+    .page-btn:hover:not(.active){border-color:var(--primary);color:var(--primary-dark);}
+
+    /* WITHDRAWAL */
+    .balance-card{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--radius);padding:28px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden;}
+    .balance-card::after{content:'₦';position:absolute;right:-10px;bottom:-20px;font-size:120px;font-weight:900;opacity:.08;}
+    .balance-label{font-size:12px;opacity:.8;margin-bottom:6px;}
+    .balance-amount{font-size:38px;font-weight:800;margin-bottom:4px;}
+    .balance-sub{font-size:12px;opacity:.7;}
+
+    /* STORE PAGE */
+    .store-preview{border:2px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    .store-banner{height:120px;background:linear-gradient(135deg,var(--primary-dark),var(--primary));position:relative;display:flex;align-items:flex-end;padding:0 20px 0;}
+    .store-logo-wrap{width:70px;height:70px;border-radius:50%;background:#fff;border:3px solid #fff;position:absolute;bottom:-35px;left:20px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:var(--shadow-md);}
+    .store-info{padding:48px 20px 20px;}
+    .store-name{font-size:18px;font-weight:800;margin-bottom:4px;}
+    .store-desc{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5;}
+    .store-stats{display:flex;gap:20px;font-size:12px;}
+    .ss-item span{font-weight:700;font-size:14px;}
+
+    /* RATING */
+    .stars{color:#f59e0b;}
+
+    /* MOBILE */
+    @media(max-width:768px){
+      aside{transform:translateX(-100%);}
+      aside.open{transform:translateX(0);}
+      .main-content{margin-left:0!important;}
+      .hamburger{display:flex;}
+      .page-content{padding:14px;}
+      .topbar{padding:10px 14px;}
+      .stats-grid{grid-template-columns:1fr 1fr;}
+      .two-col,.two-col-eq,.three-col{grid-template-columns:1fr;}
+      .form-row,.form-row-3{grid-template-columns:1fr;}
+    }
+    @media(max-width:480px){
+      .stats-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- VENDOR SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-brand">Ecove Marketplace</div>
+    <div class="logo-name">TechHub Lagos <div class="dot"></div></div>
+    <div class="logo-status">● Active Vendor</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="showPage('earnings')"><span class="nav-icon">💰</span>Earnings & Payouts</div>
+    <div class="nav-item" onclick="showPage('store-page')"><span class="nav-icon">🏪</span>My Store Page</div>
+
+    <div class="nav-section">Products</div>
+    <div class="nav-item" onclick="showPage('add-product')"><span class="nav-icon">➕</span>Add New Product</div>
+    <div class="nav-item" onclick="showPage('my-products')"><span class="nav-icon">🛍️</span>My Products</div>
+    <div class="nav-item" onclick="showPage('pending-products')"><span class="nav-icon">⏳</span>Pending Approval<span class="nav-badge">3</span></div>
+    <div class="nav-item" onclick="showPage('inventory')"><span class="nav-icon">📦</span>Inventory</div>
+
+    <div class="nav-section">Orders</div>
+    <div class="nav-item" onclick="showPage('orders')"><span class="nav-icon">🚚</span>My Orders<span class="nav-badge">5</span></div>
+    <div class="nav-item" onclick="showPage('returns')"><span class="nav-icon">🔄</span>Returns</div>
+
+    <div class="nav-section">Reports</div>
+    <div class="nav-item" onclick="showPage('reports')"><span class="nav-icon">📈</span>Sales Reports</div>
+    <div class="nav-item" onclick="showPage('reviews')"><span class="nav-icon">⭐</span>My Reviews</div>
+
+    <div class="nav-section">Account</div>
+    <div class="nav-item" onclick="showPage('profile')"><span class="nav-icon">👤</span>Profile & Bank</div>
+    <div class="nav-item" onclick="showPage('policies')"><span class="nav-icon">📋</span>Marketplace Policies</div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="vendor-profile">
+      <div class="v-avatar">T</div>
+      <div>
+        <div class="v-name">Chukwuemeka Obi</div>
+        <div class="v-id">ID: V001 · Rating: ★ 4.8</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-content" id="mainContent">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <div>
+        <div class="page-title" id="vPageTitle">Vendor Dashboard</div>
+        <div class="page-subtitle" id="vPageSubtitle">Welcome back, Chukwuemeka!</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn outline" id="vSecBtn">📥 Export</button>
+      <button class="tb-btn primary" id="vPrimBtn" onclick="showPage('add-product')">+ Add Product</button>
+      <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="vendor-page active" id="vpage-dashboard">
+      <div class="notice warning">
+        <span class="notice-icon">⚠️</span>
+        <div class="notice-text"><strong>3 products pending admin review.</strong> You will be notified once they are approved or rejected. Products are only visible to customers after admin approval.</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon si-orange">💰</div><div><div class="stat-label">Total Revenue</div><div class="stat-value">₦4.2M</div><div class="stat-change up">↑ 18% this month</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-blue">📦</div><div><div class="stat-label">Orders</div><div class="stat-value">324</div><div class="stat-change up">↑ 22 this week</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-green">🛍️</div><div><div class="stat-label">Live Products</div><div class="stat-value">139</div><div class="stat-change up">↑ 5 approved</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-purple">⭐</div><div><div class="stat-label">Avg Rating</div><div class="stat-value">4.8</div><div class="stat-change up">↑ 0.2 this month</div></div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">📈 Sales — Last 7 Days</span></div>
+          <div class="card-body">
+            <div class="chart-bars" id="vendorChart"></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:8px;padding:0 4px"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">💸 Pending Payout</span></div>
+            <div class="card-body" style="text-align:center">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Available for withdrawal</div>
+              <div style="font-size:36px;font-weight:800;color:var(--green);margin-bottom:4px">₦580,000</div>
+              <div style="font-size:11px;color:var(--muted);margin-bottom:16px">After 8% commission deduction</div>
+              <button class="tb-btn primary" style="width:100%;padding:12px" onclick="showPage('earnings')">Request Withdrawal</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">⚡ Quick Actions</span></div>
+            <div class="card-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button onclick="showPage('add-product')" style="padding:12px;background:var(--primary-light);border:1px solid var(--primary);border-radius:8px;font-size:12px;font-weight:600;color:var(--primary-dark);cursor:pointer">➕ Add Product</button>
+                <button onclick="showPage('orders')" style="padding:12px;background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;font-size:12px;font-weight:600;color:#1e40af;cursor:pointer">📦 View Orders</button>
+                <button onclick="showPage('inventory')" style="padding:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;font-size:12px;font-weight:600;color:#15803d;cursor:pointer">📊 Inventory</button>
+                <button onclick="showPage('store-page')" style="padding:12px;background:#fdf4ff;border:1px solid #d8b4fe;border-radius:8px;font-size:12px;font-weight:600;color:#7e22ce;cursor:pointer">🏪 My Store</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">📦 Recent Orders</span><a href="#" onclick="showPage('orders')" style="font-size:12px;color:var(--primary-dark)">View All</a></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="recentOrdersTable"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⏳ Product Status</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">✅ Approved (Live)</span><span style="font-size:12px;font-weight:700;color:var(--green)">139</span></div><div class="progress-bar"><div class="progress-fill" style="width:89%;background:var(--green)"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">⏳ Pending Review</span><span style="font-size:12px;font-weight:700;color:var(--yellow)">3</span></div><div class="progress-bar"><div class="progress-fill" style="width:2%;background:var(--yellow)"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">❌ Rejected</span><span style="font-size:12px;font-weight:700;color:var(--red)">2</span></div><div class="progress-bar"><div class="progress-fill" style="width:1.3%;background:var(--red)"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">📦 Out of Stock</span><span style="font-size:12px;font-weight:700;color:var(--muted)">4</span></div><div class="progress-bar"><div class="progress-fill" style="width:2.5%;background:#d1d5db"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ADD PRODUCT ═══ -->
+    <div class="vendor-page" id="vpage-add-product">
+      <div class="notice info">
+        <span class="notice-icon">ℹ️</span>
+        <div class="notice-text"><strong>Products require admin approval before going live.</strong> After submission, Ecove admins will review your product. You'll receive an email once it's approved or if changes are needed. Typically within 24 hours.</div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📝 Product Details</span></div>
+            <div class="card-body">
+              <div class="form-group"><label>Product Name *</label><input type="text" placeholder="e.g. Samsung Galaxy A55 5G 256GB Space Navy"/></div>
+              <div class="form-group"><label>Category *</label><select><option value="">— Select Category —</option><option>Phones & Tablets</option><option>Computing</option><option>Electronics</option><option>Fashion</option><option>Home & Kitchen</option><option>Beauty & Health</option><option>Baby Products</option><option>Sports & Outdoors</option><option>Groceries</option><option>Automotive</option><option>Gaming</option><option>Books & Education</option></select><div class="hint">Categories are set by Ecove admin. You cannot add custom categories.</div></div>
+              <div class="form-group"><label>Brand</label><input type="text" placeholder="e.g. Samsung, Apple, Nike…"/></div>
+              <div class="form-group"><label>Short Description *</label><input type="text" placeholder="One-line summary shown in listings (max 120 chars)"/></div>
+              <div class="form-group"><label>Full Description *</label><textarea placeholder="Detailed product description. Include key features, dimensions, materials, what's in the box, etc."></textarea></div>
+              <div class="form-group"><label>Specifications</label><textarea placeholder="Key: Value pairs, one per line&#10;RAM: 12GB&#10;Storage: 256GB&#10;Display: 6.4&quot; AMOLED&#10;Battery: 5000mAh"></textarea></div>
+              <div class="form-group"><label>Tags</label><input type="text" placeholder="samsung, galaxy, 5g, smartphone (comma separated)"/></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">💰 Pricing & Stock</span></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group"><label>Selling Price (₦) *</label><input type="number" placeholder="285000"/><div class="hint">Your commission: 8% = ₦22,800 → You receive ₦262,200</div></div>
+                <div class="form-group"><label>Compare At Price (₦)</label><input type="number" placeholder="320000"/><div class="hint">Original price — shows as crossed out</div></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Stock Quantity *</label><input type="number" placeholder="50"/></div>
+                <div class="form-group"><label>Low Stock Alert</label><input type="number" placeholder="5"/></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>SKU</label><input type="text" placeholder="SAM-A55-256-NAVY"/></div>
+                <div class="form-group"><label>Weight (kg)</label><input type="number" step="0.1" placeholder="0.2"/></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">🎨 Product Variants</span><button class="action-btn action-edit">+ Add Variant</button></div>
+            <div class="card-body">
+              <div id="variantsList">
+                <div style="padding:12px;background:#fafafa;border-radius:8px;margin-bottom:8px">
+                  <div class="form-row-3">
+                    <div class="form-group" style="margin-bottom:0"><label style="font-size:11px">Variant Name</label><input type="text" placeholder="Color" style="padding:7px 10px"/></div>
+                    <div class="form-group" style="margin-bottom:0"><label style="font-size:11px">Value</label><input type="text" placeholder="Space Navy" style="padding:7px 10px"/></div>
+                    <div class="form-group" style="margin-bottom:0"><label style="font-size:11px">Stock</label><input type="number" placeholder="20" style="padding:7px 10px"/></div>
+                  </div>
+                </div>
+              </div>
+              <button class="action-btn action-edit" style="margin-top:4px" onclick="addVariant()">+ Add another variant</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📷 Product Images</span></div>
+            <div class="card-body">
+              <div class="upload-area">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Click to upload images</div>
+                <div class="upload-hint">JPG/PNG/WEBP · Max 5MB each · Up to 8 images</div>
+              </div>
+              <div class="img-grid">
+                <div class="img-slot filled">📱<div style="font-size:8px;color:var(--primary-dark);margin-top:2px">Main</div></div>
+                <div class="img-slot">+</div>
+                <div class="img-slot">+</div>
+                <div class="img-slot">+</div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:8px">First image is used as the main listing photo. Use clear, bright images on white backgrounds for best approval chances.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">🚚 Shipping</span></div>
+            <div class="card-body">
+              <div class="form-group"><label>Handling Time</label><select><option>1-2 business days</option><option>Same day</option><option>2-3 business days</option><option>3-5 business days</option></select></div>
+              <div class="form-group"><label>Ships From</label><input type="text" placeholder="Lagos, Nigeria"/></div>
+              <div class="form-group">
+                <div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Free shipping eligible</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="border:2px solid var(--yellow);background:var(--yellow-light);">
+            <div class="card-body">
+              <div style="font-size:13px;font-weight:700;margin-bottom:8px">⚠️ Submission Rules</div>
+              <ul style="font-size:12px;color:var(--muted);padding-left:18px;line-height:1.8">
+                <li>Accurate product descriptions required</li>
+                <li>At least 1 clear product image</li>
+                <li>No counterfeit or prohibited items</li>
+                <li>Correct category selection</li>
+                <li>Realistic pricing (no price inflation)</li>
+                <li>Stock must be available before listing</li>
+              </ul>
+            </div>
+          </div>
+
+          <button class="tb-btn primary" style="width:100%;padding:14px;font-size:15px">Submit for Admin Review →</button>
+          <button class="tb-btn outline" style="width:100%;padding:12px;margin-top:8px">Save as Draft</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MY PRODUCTS ═══ -->
+    <div class="vendor-page" id="vpage-my-products">
+      <div class="filter-row">
+        <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" placeholder="Search your products…"/></div>
+        <select><option>All Status</option><option>Approved</option><option>Pending</option><option>Rejected</option></select>
+        <select><option>All Categories</option></select>
+        <button class="tb-btn primary" onclick="showPage('add-product')">+ Add Product</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Sales</th><th>Actions</th></tr></thead>
+          <tbody id="myProductsTable"></tbody>
+        </table></div>
+        <div style="padding:14px"><div class="pagination" id="myProductsPagination"></div></div>
+      </div>
+    </div>
+
+    <!-- ═══ PENDING PRODUCTS ═══ -->
+    <div class="vendor-page" id="vpage-pending-products">
+      <div class="notice warning">
+        <span class="notice-icon">⏳</span>
+        <div class="notice-text"><strong>3 products are awaiting admin review.</strong> Do not resubmit unless you receive a rejection notice. Admin reviews typically take 12–24 hours.</div>
+      </div>
+      <div id="pendingProductsList"></div>
+    </div>
+
+    <!-- ═══ INVENTORY ═══ -->
+    <div class="vendor-page" id="vpage-inventory">
+      <div class="qs-strip">
+        <div class="qs-item"><div class="qs-val">142</div><div class="qs-lbl">Total Products</div></div>
+        <div class="qs-item"><div class="qs-val" style="color:var(--red)">4</div><div class="qs-lbl">Out of Stock</div></div>
+        <div class="qs-item"><div class="qs-val" style="color:var(--yellow)">8</div><div class="qs-lbl">Low Stock</div></div>
+        <div class="qs-item"><div class="qs-val" style="color:var(--green)">130</div><div class="qs-lbl">In Stock</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📦 Inventory Management</span>
+          <button class="tb-btn primary">📥 Bulk Update</button></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Product</th><th>SKU</th><th>Price</th><th>Stock</th><th>Alert At</th><th>Status</th><th>Update</th></tr></thead>
+          <tbody id="inventoryTable"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ═══ ORDERS ═══ -->
+    <div class="vendor-page" id="vpage-orders">
+      <div class="qs-strip">
+        <div class="qs-item"><div class="qs-val">324</div><div class="qs-lbl">All Orders</div></div>
+        <div class="qs-item"><div class="qs-val" style="color:var(--yellow)">5</div><div class="qs-lbl">New/Pending</div></div>
+        <div class="qs-item"><div class="qs-val" style="color:var(--blue)">12</div><div class="qs-lbl">Processing</div></div>
+        <div class="qs-item"><div class="qs-val" style="color:var(--green)">301</div><div class="qs-lbl">Delivered</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">My Orders</span>
+          <div style="display:flex;gap:8px"><select style="width:auto;padding:8px 10px;font-size:13px"><option>All</option><option>Pending</option><option>Processing</option><option>Shipped</option></select><button class="tb-btn outline">📥 Export</button></div>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Commission</th><th>You Earn</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="vendorOrdersTable"></tbody>
+        </table></div>
+        <div style="padding:14px"><div class="pagination" id="vendorOrdersPag"></div></div>
+      </div>
+    </div>
+
+    <!-- ═══ EARNINGS & PAYOUTS ═══ -->
+    <div class="vendor-page" id="vpage-earnings">
+      <div class="balance-card">
+        <div class="balance-label">Available Balance</div>
+        <div class="balance-amount">₦580,000</div>
+        <div class="balance-sub">Total earned: ₦3,864,000 · Paid out: ₦3,284,000 · Commission paid: ₦336,000</div>
+      </div>
+
+      <div class="three-col">
+        <div class="card"><div class="card-body" style="text-align:center"><div style="font-size:12px;color:var(--muted)">This Month</div><div style="font-size:26px;font-weight:800;color:var(--primary-dark)">₦980,000</div><div style="font-size:11px;color:var(--muted)">Net after commission</div></div></div>
+        <div class="card"><div class="card-body" style="text-align:center"><div style="font-size:12px;color:var(--muted)">Commission Paid</div><div style="font-size:26px;font-weight:800;color:var(--red)">₦89,000</div><div style="font-size:11px;color:var(--muted)">8% of gross sales</div></div></div>
+        <div class="card"><div class="card-body" style="text-align:center"><div style="font-size:12px;color:var(--muted)">Last Payout</div><div style="font-size:26px;font-weight:800;color:var(--green)">₦420,000</div><div style="font-size:11px;color:var(--muted)">Paid March 1, 2025</div></div></div>
+      </div>
+
+      <div class="two-col-eq">
+        <div class="card">
+          <div class="card-header"><span class="card-title">💸 Request Withdrawal</span></div>
+          <div class="card-body">
+            <div style="padding:14px;background:var(--green-light);border-radius:8px;margin-bottom:16px">
+              <div style="font-size:12px;color:var(--muted)">Available for withdrawal</div>
+              <div style="font-size:28px;font-weight:800;color:var(--green)">₦580,000</div>
+            </div>
+            <div class="form-group"><label>Amount to Withdraw (₦)</label><input type="number" placeholder="580000"/><div class="hint">Minimum: ₦5,000 · Maximum: ₦580,000</div></div>
+            <div class="form-group"><label>Pay to Account</label><select><option>First Bank — 3012345678 (Default)</option></select></div>
+            <div class="form-group"><label>Note (optional)</label><input type="text" placeholder="Monthly withdrawal March 2025"/></div>
+            <div style="padding:12px;background:var(--yellow-light);border-radius:8px;margin-bottom:16px;font-size:12px;color:#92400e">
+              ⚠️ Withdrawal requests require admin approval. Funds are released within 2–5 business days after approval.
+            </div>
+            <button class="tb-btn primary" style="width:100%;padding:12px" onclick="submitWithdrawal()">Submit Withdrawal Request</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📋 Payout History</span></div>
+          <div class="card-body" id="payoutHistory"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ REPORTS ═══ -->
+    <div class="vendor-page" id="vpage-reports">
+      <div class="two-col">
+        <div class="card"><div class="card-header"><span class="card-title">📊 Sales Last 30 Days</span></div><div class="card-body"><div class="chart-bars" id="reportsChart"></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:8px"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">🏆 Top Products</span></div><div class="card-body" id="topProductsReport"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📥 Download Reports</span></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+            <button style="padding:14px;background:#fafafa;border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:left;font-size:13px;font-weight:600">📦 Orders Report<br><span style="font-weight:400;color:var(--muted);font-size:11px">All orders CSV</span></button>
+            <button style="padding:14px;background:#fafafa;border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:left;font-size:13px;font-weight:600">💰 Earnings Report<br><span style="font-weight:400;color:var(--muted);font-size:11px">Revenue and commissions</span></button>
+            <button style="padding:14px;background:#fafafa;border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:left;font-size:13px;font-weight:600">📊 Product Performance<br><span style="font-weight:400;color:var(--muted);font-size:11px">Views, clicks, conversions</span></button>
+            <button style="padding:14px;background:#fafafa;border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:left;font-size:13px;font-weight:600">⭐ Review Summary<br><span style="font-weight:400;color:var(--muted);font-size:11px">All customer reviews</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MY REVIEWS ═══ -->
+    <div class="vendor-page" id="vpage-reviews">
+      <div class="qs-strip">
+        <div class="qs-item"><div class="qs-val">★ 4.8</div><div class="qs-lbl">Avg Rating</div></div>
+        <div class="qs-item"><div class="qs-val">284</div><div class="qs-lbl">Total Reviews</div></div>
+        <div class="qs-item"><div class="qs-val" style="color:var(--green)">241</div><div class="qs-lbl">4–5 Stars</div></div>
+        <div class="qs-item"><div class="qs-val" style="color:var(--red)">12</div><div class="qs-lbl">1–2 Stars</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Customer Reviews</span>
+          <select style="width:auto;padding:8px 10px;font-size:12px"><option>All Reviews</option><option>5 Stars</option><option>1-2 Stars</option></select>
+        </div>
+        <div class="card-body" id="vendorReviews"></div>
+      </div>
+    </div>
+
+    <!-- ═══ STORE PAGE ═══ -->
+    <div class="vendor-page" id="vpage-store-page">
+      <div class="two-col-eq">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🏪 Store Page Editor</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Store Name</label><input type="text" value="TechHub Lagos"/></div>
+            <div class="form-group"><label>Store Tagline</label><input type="text" value="Premium Electronics at the Best Prices"/></div>
+            <div class="form-group"><label>Store Description</label><textarea>Premium electronics retailer with 5 years experience in consumer tech. We stock genuine Samsung, Apple, HP and more with warranty support.</textarea></div>
+            <div class="form-group"><label>Store Logo</label><div class="upload-area" style="padding:16px"><div class="upload-icon" style="font-size:24px">🖼️</div><div class="upload-hint">PNG/SVG, 200×200px recommended</div></div></div>
+            <div class="form-group"><label>Store Banner Image</label><div class="upload-area" style="padding:16px"><div class="upload-icon" style="font-size:24px">🖼️</div><div class="upload-hint">Recommended: 1200×300px</div></div></div>
+            <div class="form-group"><label>WhatsApp (for customers to contact)</label><input type="tel" placeholder="+234 801 234 5678"/></div>
+            <div class="form-group"><label>Store URL (auto-generated)</label><input type="text" value="ecove.com.ng/store/techhub-lagos" readonly style="background:#fafafa;color:var(--muted)"/></div>
+            <button class="tb-btn primary" style="width:100%;padding:12px">Save Store Profile</button>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">👁 Store Preview</span><a href="#" style="font-size:12px;color:var(--primary-dark)">View Live →</a></div>
+            <div class="store-preview">
+              <div class="store-banner">
+                <div class="store-logo-wrap">🏪</div>
+              </div>
+              <div class="store-info">
+                <div class="store-name">TechHub Lagos</div>
+                <div style="color:#f59e0b;font-size:13px;margin-bottom:6px">★★★★★ 4.8 (284 reviews)</div>
+                <div class="store-desc">Premium electronics retailer with 5 years experience. We stock genuine Samsung, Apple, HP and more.</div>
+                <div class="store-stats">
+                  <div class="ss-item"><span>142</span><div>Products</div></div>
+                  <div class="ss-item"><span>324</span><div>Orders</div></div>
+                  <div class="ss-item"><span>98%</span><div>Positive</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📊 Store Performance</span></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">Store Views</span><span style="font-size:12px;font-weight:700">2,840</span></div><div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">Positive Feedback</span><span style="font-size:12px;font-weight:700;color:var(--green)">98%</span></div><div class="progress-bar"><div class="progress-fill" style="width:98%;background:var(--green)"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">On-time Delivery</span><span style="font-size:12px;font-weight:700;color:var(--green)">94%</span></div><div class="progress-bar"><div class="progress-fill" style="width:94%;background:var(--green)"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">Response Rate</span><span style="font-size:12px;font-weight:700;color:var(--yellow)">76%</span></div><div class="progress-bar"><div class="progress-fill" style="width:76%;background:var(--yellow)"></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PROFILE ═══ -->
+    <div class="vendor-page" id="vpage-profile">
+      <div class="two-col-eq">
+        <div class="card">
+          <div class="card-header"><span class="card-title">👤 Business Profile</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Business Name</label><input type="text" value="TechHub Lagos"/></div>
+            <div class="form-group"><label>Full Name</label><input type="text" value="Chukwuemeka Obi"/></div>
+            <div class="form-group"><label>Email</label><input type="email" value="tech@techhublag.com"/></div>
+            <div class="form-group"><label>Phone</label><input type="tel" value="+234 801 234 5678"/></div>
+            <div class="form-group"><label>Business Address</label><textarea>14 Balogun Street, Lagos Island, Lagos</textarea></div>
+            <div class="form-group"><label>Business Description</label><textarea>Premium electronics retailer with 5 years experience in consumer tech.</textarea></div>
+            <div class="form-group"><label>ID Verification</label><div style="padding:12px;background:var(--green-light);border-radius:8px;display:flex;align-items:center;gap:8px"><span>✅</span><span style="font-size:13px;color:var(--green);font-weight:600">Identity Verified</span></div></div>
+            <button class="tb-btn primary" style="width:100%;padding:12px">Update Profile</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🏦 Bank Details</span></div>
+          <div class="card-body">
+            <div class="notice info"><span class="notice-icon">ℹ️</span><div class="notice-text">Earnings are paid to your bank account. Ensure your bank details are accurate before requesting withdrawal.</div></div>
+            <div class="form-group"><label>Bank Name</label><select><option>First Bank of Nigeria</option><option>Guaranty Trust Bank (GTBank)</option><option>Zenith Bank</option><option>Access Bank</option><option>UBA</option><option>Opay</option><option>Kuda Bank</option></select></div>
+            <div class="form-group"><label>Account Number</label><input type="text" value="3012345678"/></div>
+            <div class="form-group"><label>Account Name</label><input type="text" value="Chukwuemeka Obi" readonly style="background:#fafafa"/><div class="hint">Auto-verified via bank lookup</div></div>
+            <div class="form-group"><label>BVN (optional, for faster payouts)</label><input type="text" placeholder="Enter your 11-digit BVN"/></div>
+            <button class="tb-btn primary" style="width:100%;padding:12px">Update Bank Details</button>
+            <div style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center">Bank details are encrypted and only used for payout processing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ POLICIES ═══ -->
+    <div class="vendor-page" id="vpage-policies">
+      <div class="card">
+        <div class="card-header"><span class="card-title">📋 Ecove Marketplace Vendor Policies</span></div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:20px;font-size:13px;line-height:1.8;color:var(--muted)">
+            <div><div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:6px">1. Product Listing Rules</div>Only list products you own or have authority to sell. All products must be accurately described. Counterfeit or prohibited goods will result in immediate account suspension.</div>
+            <div><div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:6px">2. Product Approval</div>Every product must be reviewed and approved by an Ecove admin before going live. Approval typically takes 12–24 hours. Rejected products include a reason; you may edit and resubmit.</div>
+            <div><div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:6px">3. Commission Structure</div>Ecove charges a category-based commission on every sale. Your default rate is 8% (Electronics). Commission rates are set by Ecove and may be adjusted with 30 days notice.</div>
+            <div><div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:6px">4. Order Fulfillment</div>You must fulfill orders within your stated handling time. Failure to ship on time may result in automatic cancellation and negative impact on your seller rating.</div>
+            <div><div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:6px">5. Payouts</div>Earnings are cleared 7 days after delivery confirmation. Minimum withdrawal is ₦5,000. All payout requests require admin approval and are typically processed within 2–5 business days.</div>
+            <div><div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:6px">6. Prohibited Items</div>Weapons, counterfeit goods, illegal substances, adult content, and items that violate Nigerian law are strictly prohibited. Violation results in permanent account termination.</div>
+            <div><div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:6px">7. Suspension & Termination</div>Ecove reserves the right to suspend or terminate any vendor account at any time for policy violations, fraud, or poor performance (rating below 3.5).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vendor-page" id="vpage-returns"><div style="text-align:center;padding:48px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">🔄</div><div style="font-size:16px;font-weight:600">Returns Management</div><p style="margin-top:8px">Manage customer return requests here.</p></div></div>
+
+  </div><!-- /page-content -->
+</div><!-- /main-content -->
+
+<script>
+// ══════════════════════════════════════
+// PAGE CONFIG
+// ══════════════════════════════════════
+const vpages = {
+  dashboard:{title:'Vendor Dashboard',sub:'Welcome back, Chukwuemeka!',btn:'+ Add Product',sec:'📥 Export'},
+  'add-product':{title:'Add New Product',sub:'Submit a product for admin review before it goes live.',btn:'Submit for Review',sec:'Save Draft'},
+  'my-products':{title:'My Products',sub:'All your product listings.',btn:'+ Add Product',sec:'📥 Export'},
+  'pending-products':{title:'Pending Approval',sub:'Products awaiting admin review.',btn:'+ Add Product',sec:'📥 Export'},
+  inventory:{title:'Inventory Manager',sub:'Track and update your stock levels.',btn:'📥 Bulk Update',sec:'📊 Report'},
+  orders:{title:'My Orders',sub:'Orders assigned to your store.',btn:'📥 Export',sec:'🔄 Refresh'},
+  earnings:{title:'Earnings & Payouts',sub:'Track your revenue and request withdrawals.',btn:'💸 Withdraw',sec:'📥 Statement'},
+  reports:{title:'Sales Reports',sub:'Analyse your store performance.',btn:'📥 Download',sec:'🔄 Refresh'},
+  reviews:{title:'My Reviews',sub:'Customer feedback on your products.',btn:'📥 Export',sec:''},
+  'store-page':{title:'My Store Page',sub:'Customize how your store appears to customers.',btn:'💾 Save',sec:'👁 Preview'},
+  profile:{title:'Profile & Bank Details',sub:'Manage your business and bank information.',btn:'💾 Save',sec:''},
+  policies:{title:'Marketplace Policies',sub:'Rules and guidelines for selling on Ecove.',btn:'📋 Print',sec:''},
+  returns:{title:'Returns',sub:'Manage customer return requests.',btn:'📥 Export',sec:''},
+};
+
+function showPage(id){
+  document.querySelectorAll('.vendor-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el = document.getElementById('vpage-'+id);
+  if(el) el.classList.add('active');
+  const cfg = vpages[id]||{title:id,sub:'',btn:'Action',sec:''};
+  document.getElementById('vPageTitle').textContent = cfg.title;
+  document.getElementById('vPageSubtitle').textContent = cfg.sub;
+  document.getElementById('vPrimBtn').textContent = cfg.btn;
+  document.getElementById('vSecBtn').textContent = cfg.sec;
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')===`showPage('${id}')`) n.classList.add('active');
+  });
+  closeSidebar();
+}
+
+// ══════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ══════════════════════════════════════
+// DATA & RENDER
+// ══════════════════════════════════════
+const myProducts = [
+  {img:'📱',name:'Samsung Galaxy A55 5G',cat:'Phones',price:'₦285,000',stock:12,status:'Approved',sales:34},
+  {img:'💻',name:'HP Pavilion 15 Core i5',cat:'Computing',price:'₦245,000',stock:5,status:'Approved',sales:22},
+  {img:'📺',name:'Hisense 43" FHD TV',cat:'Electronics',price:'₦195,000',stock:0,status:'Approved',sales:18},
+  {img:'🖱️',name:'Logitech MX Master 3',cat:'Computing',price:'₦28,000',stock:32,status:'Approved',sales:56},
+  {img:'🎧',name:'Sony WH-1000XM5',cat:'Electronics',price:'₦165,000',stock:8,status:'Pending',sales:0},
+  {img:'📷',name:'Canon EOS M50 Mark II',cat:'Electronics',price:'₦480,000',stock:3,status:'Rejected',sales:0},
+];
+document.getElementById('myProductsTable').innerHTML = myProducts.map(p=>`
+  <tr>
+    <td><div class="td-product"><div class="td-thumb">${p.img}</div><div><div class="td-name">${p.name}</div></div></div></td>
+    <td>${p.cat}</td>
+    <td style="font-weight:700">${p.price}</td>
+    <td>${p.stock}</td>
+    <td><span class="badge ${p.status==='Approved'?'badge-success':p.status==='Pending'?'badge-warning':'badge-danger'}">${p.status}</span></td>
+    <td>${p.sales} sold</td>
+    <td><button class="action-btn action-edit">✏️ Edit</button>${p.status==='Rejected'?'<button class="action-btn action-view" style="margin-left:4px">🔁 Resubmit</button>':''}</td>
+  </tr>`).join('');
+document.getElementById('myProductsPagination').innerHTML = [1,2,3].map((p,i)=>`<div class="page-btn ${i===0?'active':''}">${p}</div>`).join('') + `<span style="margin-left:auto;font-size:11px;color:var(--muted)">142 products</span>`;
+
+// Pending products
+document.getElementById('pendingProductsList').innerHTML = [
+  {img:'🎧',name:'Sony WH-1000XM5 Wireless Headphones',price:'₦165,000',desc:'Flagship noise-cancelling headphones. Submitted 6 hours ago.'},
+  {img:'⌚',name:'Apple Watch Series 9 GPS 45mm',price:'₦420,000',desc:'Latest Apple Watch with health monitoring. Submitted 1 day ago.'},
+  {img:'🖨️',name:'HP LaserJet Pro M404dn Printer',price:'₦145,000',desc:'Business laser printer, auto duplex. Submitted 2 days ago.'},
+].map(p=>`
+  <div style="background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px;display:flex;gap:14px;border-left:4px solid var(--yellow)">
+    <div style="width:64px;height:64px;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">${p.img}</div>
+    <div style="flex:1">
+      <div style="font-weight:700;margin-bottom:4px">${p.name}</div>
+      <div style="font-size:14px;font-weight:800;color:var(--primary-dark);margin-bottom:4px">${p.price}</div>
+      <div style="font-size:12px;color:var(--muted)">${p.desc}</div>
+    </div>
+    <span class="badge badge-warning" style="align-self:flex-start">⏳ Under Review</span>
+  </div>`).join('');
+
+// Inventory
+document.getElementById('inventoryTable').innerHTML = myProducts.map(p=>`
+  <tr>
+    <td><div class="td-product"><div class="td-thumb">${p.img}</div><div class="td-name">${p.name}</div></div></td>
+    <td style="font-family:monospace;font-size:11px;color:var(--muted)">SKU-00${Math.floor(Math.random()*99)}</td>
+    <td>${p.price}</td>
+    <td style="font-weight:700;color:${p.stock===0?'var(--red)':p.stock<6?'var(--yellow)':'var(--green)'}">${p.stock}</td>
+    <td>5</td>
+    <td><span class="badge ${p.stock===0?'badge-danger':p.stock<6?'badge-warning':'badge-success'}">${p.stock===0?'Out of Stock':p.stock<6?'Low Stock':'In Stock'}</span></td>
+    <td><input type="number" value="${p.stock}" style="width:70px;padding:5px 8px"/> <button class="action-btn action-edit" style="margin-left:4px">Update</button></td>
+  </tr>`).join('');
+
+// Orders
+const ordersData = [
+  {id:'#ECO-5421',cust:'John A.',prod:'Samsung Galaxy A55',qty:1,total:'₦285,000',comm:'₦22,800',earn:'₦262,200',status:'Delivered'},
+  {id:'#ECO-5418',cust:'Fatima L.',prod:'Logitech MX Master',qty:2,total:'₦56,000',comm:'₦4,480',earn:'₦51,520',status:'Shipped'},
+  {id:'#ECO-5412',cust:'Emeka N.',prod:'HP Pavilion 15',qty:1,total:'₦245,000',comm:'₦19,600',earn:'₦225,400',status:'Processing'},
+  {id:'#ECO-5408',cust:'Ngozi P.',prod:'Sony WH-1000XM5',qty:1,total:'₦165,000',comm:'₦13,200',earn:'₦151,800',status:'Pending'},
+];
+const sb = {Delivered:'badge-success',Shipped:'badge-info',Processing:'badge-warning',Pending:'badge-orange'};
+document.getElementById('vendorOrdersTable').innerHTML = ordersData.map(o=>`
+  <tr>
+    <td><strong>${o.id}</strong></td><td>${o.cust}</td><td>${o.prod}</td><td>${o.qty}</td>
+    <td style="font-weight:700">${o.total}</td>
+    <td style="color:var(--red);font-weight:600">${o.comm}</td>
+    <td style="color:var(--green);font-weight:700">${o.earn}</td>
+    <td><span class="badge ${sb[o.status]||''}">${o.status}</span></td>
+    <td><button class="action-btn action-view">👁</button></td>
+  </tr>`).join('');
+document.getElementById('vendorOrdersPag').innerHTML = [1,2,3].map((p,i)=>`<div class="page-btn ${i===0?'active':''}">${p}</div>`).join('');
+
+// Recent orders (dashboard)
+document.getElementById('recentOrdersTable').innerHTML = ordersData.slice(0,3).map(o=>`
+  <tr>
+    <td><strong>${o.id}</strong></td><td>${o.cust}</td>
+    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.prod}</td>
+    <td style="font-weight:700">${o.total}</td>
+    <td><span class="badge ${sb[o.status]||''}">${o.status}</span></td>
+  </tr>`).join('');
+
+// Payout history
+document.getElementById('payoutHistory').innerHTML = [
+  {date:'Mar 1',amount:'₦420,000',status:'Paid'},
+  {date:'Feb 17',amount:'₦380,000',status:'Paid'},
+  {date:'Feb 1',amount:'₦520,000',status:'Paid'},
+  {date:'Jan 18',amount:'₦290,000',status:'Paid'},
+].map(p=>`
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+    <div><div style="font-size:13px;font-weight:600">${p.amount}</div><div style="font-size:11px;color:var(--muted)">${p.date}</div></div>
+    <span class="badge badge-success">${p.status}</span>
+  </div>`).join('');
+
+// Reviews
+document.getElementById('vendorReviews').innerHTML = [
+  {product:'Samsung Galaxy A55',customer:'John A.',rating:5,text:'Excellent! Fast delivery, genuine product, good packaging.',date:'Mar 7'},
+  {product:'Logitech MX Master',customer:'Emeka N.',rating:5,text:'Great mouse, exactly as described. Highly recommend this seller.',date:'Mar 5'},
+  {product:'HP Pavilion 15',customer:'Amaka O.',rating:4,text:'Good laptop but delivery took 3 days instead of 1-2.',date:'Mar 3'},
+  {product:'Hisense TV',customer:'Fatima L.',rating:2,text:'TV arrived with a scratch on the screen. Vendor offered partial refund.',date:'Feb 28'},
+].map(r=>`
+  <div style="padding:14px 0;border-bottom:1px solid var(--border)">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <div><div style="font-size:13px;font-weight:700">${r.product}</div><div style="font-size:11px;color:var(--muted)">by ${r.customer} · ${r.date}</div></div>
+      <span style="color:#f59e0b;font-size:14px">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+    </div>
+    <div style="font-size:13px;color:var(--muted)">"${r.text}"</div>
+  </div>`).join('');
+
+// Charts
+const chartVals = [280000,420000,180000,560000,340000,680000,290000];
+const chartMax = Math.max(...chartVals);
+['vendorChart','reportsChart'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = chartVals.map((v,i)=>`
+    <div class="bar-wrap">
+      <div class="bar-val">₦${(v/1000).toFixed(0)}k</div>
+      <div class="bar" style="height:${(v/chartMax)*100}%;background:${i===5?'var(--primary-dark)':'var(--primary)'}"></div>
+    </div>`).join('');
+});
+
+// Top products for report
+document.getElementById('topProductsReport').innerHTML = myProducts.slice(0,4).map((p,i)=>`
+  <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5">
+    <span style="font-size:11px;font-weight:700;color:var(--muted);width:18px">${i+1}</span>
+    <span style="font-size:20px">${p.img}</span>
+    <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div><div style="font-size:11px;color:var(--muted)">${p.sales} sold</div></div>
+    <span style="font-size:12px;font-weight:700;color:var(--primary-dark)">${p.price}</span>
+  </div>`).join('');
+
+// ══════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════
+function addVariant(){
+  const list = document.getElementById('variantsList');
+  const div = document.createElement('div');
+  div.style.cssText = 'padding:12px;background:#fafafa;border-radius:8px;margin-bottom:8px';
+  div.innerHTML = `<div class="form-row-3"><div class="form-group" style="margin-bottom:0"><label style="font-size:11px">Variant</label><input type="text" placeholder="Size" style="padding:7px 10px"/></div><div class="form-group" style="margin-bottom:0"><label style="font-size:11px">Value</label><input type="text" placeholder="XL" style="padding:7px 10px"/></div><div class="form-group" style="margin-bottom:0"><label style="font-size:11px">Stock</label><input type="number" placeholder="10" style="padding:7px 10px"/></div></div>`;
+  list.appendChild(div);
+}
+
+function submitWithdrawal(){
+  if(confirm('Submit withdrawal request for ₦580,000?\n\nAdmin will review and process within 2-5 business days.'))
+    alert('✅ Withdrawal request submitted! You will be notified once the admin approves and processes your payout.');
+}
+</script>
+</body>
+</html>

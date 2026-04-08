@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ecove Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Jumia authentic brand palette */
+      --primary:      #f68b1f;
+      --primary-dark: #d4720e;
+      --primary-light: #fff4e6;
+      /* keep semantic aliases */
+      --green: #1e8a44; --green-dark: #166b34; --green-light: #e8f7ef;
+      --orange: #f68b1f;
+      --red: #e53935; --blue: #1976d2; --purple: #7c3aed;
+      --yellow: #f59e0b;
+      --sidebar-bg: #1c1c1c;  /* near-black, Jumia charcoal */
+      --sidebar-text: rgba(255,255,255,0.7);
+      --sidebar-active: rgba(246,139,31,0.18);  /* orange tint */
+      --bg: #f5f5f5;
+      --white: #fff; --border: #e5e7eb; --text: #313131; --muted: #6b7280;
+      --shadow: 0 1px 8px rgba(0,0,0,0.08); --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
+
+    /* SIDEBAR */
+    aside {
+      width: 248px; background: var(--sidebar-bg); min-height: 100vh;
+      display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0;
+      z-index: 100; transition: width 0.3s;
+    }
+    .sidebar-logo {
+      padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px;
+    }
+    .sidebar-logo span { color: var(--primary); }
+    .sidebar-logo small { display: block; font-size: 10px; font-weight: 400; color: rgba(255,255,255,0.4); margin-top: 2px; letter-spacing: 2px; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+    .nav-section { padding: 12px 16px 4px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1.5px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+      color: var(--sidebar-text); cursor: pointer; transition: all 0.15s;
+      border-radius: 0; font-size: 13px; font-weight: 500; position: relative;
+      margin: 1px 8px; border-radius: 8px;
+    }
+    .nav-item:hover { background: var(--sidebar-active); color: white; }
+    .nav-item.active { background: var(--primary); color: white; }
+    .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-badge {
+      margin-left: auto; background: var(--orange); color: white;
+      font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 20px;
+    }
+    .sidebar-footer {
+      padding: 16px; border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .admin-profile {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      padding: 8px; border-radius: 8px; transition: background 0.15s;
+    }
+    .admin-profile:hover { background: var(--sidebar-active); }
+    .admin-avatar {
+      width: 38px; height: 38px; border-radius: 50%; background: var(--primary);
+      display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 14px; flex-shrink: 0;
+    }
+    .admin-name { font-size: 13px; font-weight: 600; color: white; }
+    .admin-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+    /* MAIN CONTENT */
+    .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; }
+    .topbar {
+      background: white; padding: 14px 28px; display: flex; align-items: center;
+      justify-content: space-between; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .page-title { font-size: 18px; font-weight: 700; }
+    .page-subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .tb-btn {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .tb-btn.primary { background: var(--primary); color: white; border: none; }
+    .tb-btn.primary:hover { background: var(--primary-dark); }
+    .tb-btn.outline { background: white; color: var(--text); border: 1px solid var(--border); }
+    .tb-btn.outline:hover { border-color: var(--green); color: var(--green); }
+    .notif-btn {
+      width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      background: white; font-size: 16px; position: relative;
+    }
+    .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; }
+
+    /* PAGE CONTENT */
+    .page-content { padding: 24px 28px; flex: 1; }
+
+    /* CARDS */
+    .card {
+      background: white; border-radius: 12px; box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-size: 15px; font-weight: 700; }
+    .card-body { padding: 20px; }
+
+    /* STATS GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow);
+      display: flex; align-items: flex-start; gap: 14px; transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .si-green { background: var(--primary-light); }
+    .si-blue { background: #e3f2fd; }
+    .si-orange { background: #fff3e0; }
+    .si-purple { background: #f3e5f5; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+    .stat-value { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+    .stat-change { font-size: 12px; font-weight: 500; }
+    .stat-change.up { color: var(--green); }
+    .stat-change.down { color: var(--red); }
+
+    /* TWO COL GRID */
+    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); background: #fafafa; }
+    td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+    .td-product { display: flex; align-items: center; gap: 10px; }
+    .td-thumb { width: 40px; height: 40px; border-radius: 8px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .td-name { font-weight: 600; font-size: 13px; }
+    .td-cat { font-size: 11px; color: var(--muted); }
+
+    /* BADGES */
+    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+    .badge-purple { background: #ede9fe; color: #5b21b6; }
+
+    /* CHART BARS */
+    .chart-bars {
+      display: flex; align-items: flex-end; gap: 8px; height: 140px; padding: 0 4px;
+    }
+    .bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .bar {
+      width: 100%; border-radius: 4px 4px 0 0; background: var(--green);
+      transition: height 0.5s ease; cursor: pointer; opacity: 0.8;
+    }
+    .bar:hover { opacity: 1; }
+    .bar-label { font-size: 10px; color: var(--muted); }
+    .bar-val { font-size: 10px; font-weight: 600; color: var(--text); }
+
+    /* MINI CHART (line simulation) */
+    .sparkline { height: 48px; display: flex; align-items: flex-end; gap: 3px; }
+    .spark-bar { flex: 1; border-radius: 2px 2px 0 0; background: var(--green-light); }
+    .spark-bar.active { background: var(--green); }
+
+    /* FORM ELEMENTS */
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    input[type=text], input[type=email], input[type=number], select, textarea {
+      width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 13px; font-family: inherit; outline: none; color: var(--text);
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(246,139,31,0.12); }
+    textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .input-group { position: relative; }
+    .input-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+    .input-group input { padding-left: 32px; }
+
+    /* TOGGLE */
+    .toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .toggle-track {
+      width: 44px; height: 24px; border-radius: 12px; background: #d1d5db;
+      position: relative; transition: background 0.2s;
+    }
+    .toggle-track.on { background: var(--primary); }
+    .toggle-thumb {
+      width: 20px; height: 20px; border-radius: 50%; background: white;
+      position: absolute; top: 2px; left: 2px; transition: left 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .toggle-track.on .toggle-thumb { left: 22px; }
+    .toggle-label { font-size: 13px; font-weight: 500; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+    .tab {
+      padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+      color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .tab.active { color: var(--primary-dark); border-bottom-color: var(--primary); }
+    .tab:hover { color: var(--text); }
+
+    /* UPLOAD AREA */
+    .upload-area {
+      border: 2px dashed var(--border); border-radius: 10px; padding: 32px;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+    }
+    .upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
+    .upload-icon { font-size: 40px; margin-bottom: 12px; }
+    .upload-text { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .upload-hint { font-size: 12px; color: var(--muted); }
+
+    /* ACTION BUTTONS */
+    .action-btn { width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: all 0.2s; border: none; }
+    .action-edit { background: #fff4e6; color: #d4720e; }
+    .action-edit:hover { background: var(--primary); color: white; }
+    .action-delete { background: #fee2e2; color: #991b1b; }
+    .action-delete:hover { background: #991b1b; color: white; }
+    .action-view { background: #dcfce7; color: #15803d; }
+    .action-view:hover { background: #15803d; color: white; }
+
+    /* PAGINATION */
+    .pagination { display: flex; align-items: center; gap: 6px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .page-btn { width: 34px; height: 34px; border-radius: 6px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .page-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary-dark); }
+
+    /* ORDER STATUS */
+    .order-timeline { padding: 12px 0; }
+    .timeline-item { display: flex; gap: 12px; margin-bottom: 16px; }
+    .tl-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 4px; }
+    .tl-dot.pending { background: var(--yellow); }
+    .tl-dot.cancelled { background: var(--red); }
+    .tl-info h6 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .tl-info p { font-size: 11px; color: var(--muted); }
+
+    /* ACTIVE PAGE SHOW/HIDE */
+    .admin-page { display: none; }
+    .admin-page.active { display: block; }
+
+    /* SEARCH BAR */
+    .search-bar { display: flex; align-items: center; gap: 10px; }
+    .search-input-wrap { position: relative; }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+    .search-input-wrap input { padding-left: 36px; width: 240px; }
+
+    /* PRODUCT IMG GRID */
+    .img-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .img-thumb {
+      aspect-ratio: 1; border-radius: 8px; border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 28px;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .img-thumb:hover, .img-thumb.active { border-color: var(--green); background: var(--green-light); }
+
+    /* QUICK STATS ROW */
+    .quick-stats { display: flex; gap: 16px; margin-bottom: 20px; }
+    .qs-item { flex: 1; background: white; border-radius: 10px; padding: 14px 18px; box-shadow: var(--shadow); }
+    .qs-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .qs-val { font-size: 22px; font-weight: 800; color: var(--text); }
+
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+      .three-col { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside>
+  <div class="sidebar-logo">
+    eco<span>ve</span>
+    <small>Admin Panel</small>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('orders')"><span class="nav-icon">📦</span> Orders <span class="nav-badge">24</span></div>
+    <div class="nav-item" onclick="showPage('products')"><span class="nav-icon">🛍️</span> Products</div>
+    <div class="nav-item" onclick="showPage('categories')"><span class="nav-icon">🗂️</span> Categories</div>
+    <div class="nav-item" onclick="showPage('customers')"><span class="nav-icon">👥</span> Customers</div>
+
+    <div class="nav-section">Marketing</div>
+    <div class="nav-item" onclick="showPage('banners')"><span class="nav-icon">🖼️</span> Banners</div>
+    <div class="nav-item" onclick="showPage('coupons')"><span class="nav-icon">🎟️</span> Coupons</div>
+    <div class="nav-item" onclick="showPage('content')"><span class="nav-icon">📝</span> Content</div>
+
+    <div class="nav-section">Store</div>
+    <div class="nav-item" onclick="showPage('payments')"><span class="nav-icon">💳</span> Payments</div>
+    <div class="nav-item" onclick="showPage('seo')"><span class="nav-icon">🔍</span> SEO Manager</div>
+    <div class="nav-item" onclick="showPage('livechat')"><span class="nav-icon">💬</span> Live Chat</div>
+    <div class="nav-item" onclick="showPage('analytics')"><span class="nav-icon">📈</span> Analytics</div>
+    <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Site Settings</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-profile">
+      <div class="admin-avatar">EA</div>
+      <div>
+        <div class="admin-name">Ecove Admin</div>
+        <div class="admin-role">Super Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-content">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard Overview</div>
+        <div class="page-subtitle" id="pageSubtitle">Welcome back! Here's what's happening today.</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn outline">📥 Export</button>
+      <button class="tb-btn primary" id="primaryActionBtn" onclick="handlePrimaryAction()">+ Add Product</button>
+      <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- DASHBOARD -->
+    <div class="admin-page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon si-green">💰</div>
+          <div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value">₦18.4M</div>
+            <div class="stat-change up">↑ 23.5% vs last month</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-blue">📦</div>
+          <div>
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value">2,847</div>
+            <div class="stat-change up">↑ 18.2% vs last month</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-orange">👥</div>
+          <div>
+            <div class="stat-label">Customers</div>
+            <div class="stat-value">14,290</div>
+            <div class="stat-change up">↑ 9.1% new this month</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-purple">🛍️</div>
+          <div>
+            <div class="stat-label">Products</div>
+            <div class="stat-value">1,453</div>
+            <div class="stat-change up">↑ 42 added this week</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Revenue Chart -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📈 Revenue Overview</span>
+            <select style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;outline:none">
+              <option>Last 7 Days</option><option>Last 30 Days</option><option>This Year</option>
+            </select>
+          </div>
+          <div class="card-body">
+            <div style="margin-bottom:8px;font-size:13px;color:var(--muted)">Daily Sales (₦)</div>
+            <div class="chart-bars" id="chartBars"></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:8px;padding:0 4px">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">📦 Recent Orders</span><a href="#" style="font-size:12px;color:var(--primary-dark)" onclick="showPage('orders')">View All</a></div>
+          <div style="padding:0 4px">
+            <div style="padding:12px 16px;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:12px;font-weight:600">#ECO-4521</div><div style="font-size:11px;color:var(--muted)">John Adebayo</div></div>
+              <div style="text-align:right"><div style="font-size:13px;font-weight:700">₦145,000</div><span class="badge badge-success">Delivered</span></div>
+            </div>
+            <div style="padding:12px 16px;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:12px;font-weight:600">#ECO-4520</div><div style="font-size:11px;color:var(--muted)">Amaka Okafor</div></div>
+              <div style="text-align:right"><div style="font-size:13px;font-weight:700">₦32,500</div><span class="badge badge-info">Shipped</span></div>
+            </div>
+            <div style="padding:12px 16px;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:12px;font-weight:600">#ECO-4519</div><div style="font-size:11px;color:var(--muted)">Emeka Nwosu</div></div>
+              <div style="text-align:right"><div style="font-size:13px;font-weight:700">₦78,000</div><span class="badge badge-warning">Processing</span></div>
+            </div>
+            <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:12px;font-weight:600">#ECO-4518</div><div style="font-size:11px;color:var(--muted)">Fatima Lawal</div></div>
+              <div style="text-align:right"><div style="font-size:13px;font-weight:700">₦210,000</div><span class="badge badge-success">Delivered</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="three-col">
+        <!-- Top Products -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">🏆 Top Products</span></div>
+          <div class="card-body">
+            <div id="topProductsList"></div>
+          </div>
+        </div>
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚡ Quick Actions</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <button onclick="showPage('products')" style="padding:14px;background:var(--primary-light);border:1px solid var(--primary);border-radius:8px;cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:var(--primary-dark);font-family:inherit">➕ Add Product</button>
+              <button onclick="showPage('orders')" style="padding:14px;background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:#1e40af;font-family:inherit">📦 View Orders</button>
+              <button onclick="showPage('banners')" style="padding:14px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:#c2410c;font-family:inherit">🖼️ Add Banner</button>
+              <button onclick="showPage('coupons')" style="padding:14px;background:#fdf4ff;border:1px solid #d8b4fe;border-radius:8px;cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:#7e22ce;font-family:inherit">🎟️ Add Coupon</button>
+              <button onclick="showPage('categories')" style="padding:14px;background:#f0f9ff;border:1px solid #7dd3fc;border-radius:8px;cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:#0369a1;font-family:inherit">🗂️ Categories</button>
+              <button onclick="showPage('customers')" style="padding:14px;background:#fef9c3;border:1px solid #fde047;border-radius:8px;cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:#854d0e;font-family:inherit">👥 Customers</button>
+            </div>
+          </div>
+        </div>
+        <!-- Stock Alerts -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚠️ Low Stock Alerts</span><span class="badge badge-danger">6 items</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#fef2f2;border-radius:6px">
+                <span style="font-size:12px;font-weight:600">Samsung S24 Ultra</span>
+                <span style="font-size:11px;color:var(--red);font-weight:700">3 left</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#fef2f2;border-radius:6px">
+                <span style="font-size:12px;font-weight:600">iPhone 15 Pro Max</span>
+                <span style="font-size:11px;color:var(--red);font-weight:700">1 left</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#fefce8;border-radius:6px">
+                <span style="font-size:12px;font-weight:600">Nike Air Max 270</span>
+                <span style="font-size:11px;color:var(--yellow);font-weight:700">8 left</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#fefce8;border-radius:6px">
+                <span style="font-size:12px;font-weight:600">HP Pavilion 15</span>
+                <span style="font-size:11px;color:var(--yellow);font-weight:700">5 left</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS PAGE -->
+    <div class="admin-page" id="page-products">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div class="search-bar">
+          <div class="search-input-wrap"><span class="search-icon">🔍</span><input type="text" placeholder="Search products..." /></div>
+          <select style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none"><option>All Categories</option><option>Phones</option><option>Electronics</option><option>Fashion</option></select>
+          <select style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none"><option>All Status</option><option>In Stock</option><option>Low Stock</option><option>Out of Stock</option></select>
+        </div>
+        <button class="tb-btn primary">+ Add Product</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="productsTableBody"></tbody>
+        </table>
+        <div style="padding:16px"><div class="pagination" id="productsPagination"></div></div>
+      </div>
+    </div>
+
+    <!-- ORDERS PAGE -->
+    <div class="admin-page" id="page-orders">
+      <div class="quick-stats">
+        <div class="qs-item"><div class="qs-label">All Orders</div><div class="qs-val">2,847</div></div>
+        <div class="qs-item"><div class="qs-label">Pending</div><div class="qs-val" style="color:var(--yellow)">124</div></div>
+        <div class="qs-item"><div class="qs-label">Processing</div><div class="qs-val" style="color:var(--blue)">89</div></div>
+        <div class="qs-item"><div class="qs-label">Shipped</div><div class="qs-val" style="color:var(--purple)">312</div></div>
+        <div class="qs-item"><div class="qs-label">Delivered</div><div class="qs-val" style="color:var(--green)">2,198</div></div>
+        <div class="qs-item"><div class="qs-label">Cancelled</div><div class="qs-val" style="color:var(--red)">124</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">All Orders</span>
+          <div style="display:flex;gap:8px">
+            <input type="text" placeholder="Search orders..." style="width:200px;padding:8px 12px;font-size:13px" />
+            <button class="tb-btn outline">📥 Export CSV</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Order ID</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+        <div style="padding:16px"><div class="pagination" id="ordersPagination"></div></div>
+      </div>
+    </div>
+
+    <!-- CATEGORIES PAGE -->
+    <div class="admin-page" id="page-categories">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">All Categories</span><button class="tb-btn primary" style="font-size:12px;padding:6px 14px">+ Add</button></div>
+          <table>
+            <thead><tr><th>Category</th><th>Products</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><div class="td-product"><div class="td-thumb">📱</div><div><div class="td-name">Phones & Tablets</div></div></div></td><td>342</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><div class="td-product"><div class="td-thumb">💻</div><div><div class="td-name">Computing</div></div></div></td><td>218</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><div class="td-product"><div class="td-thumb">📺</div><div><div class="td-name">Electronics</div></div></div></td><td>189</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><div class="td-product"><div class="td-thumb">👗</div><div><div class="td-name">Fashion</div></div></div></td><td>456</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><div class="td-product"><div class="td-thumb">🏠</div><div><div class="td-name">Home & Kitchen</div></div></div></td><td>234</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><div class="td-product"><div class="td-thumb">💄</div><div><div class="td-name">Beauty & Health</div></div></div></td><td>167</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><div class="td-product"><div class="td-thumb">👶</div><div><div class="td-name">Baby Products</div></div></div></td><td>98</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><div class="td-product"><div class="td-thumb">⚽</div><div><div class="td-name">Sports & Outdoors</div></div></div></td><td>112</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><div class="td-product"><div class="td-thumb">🛒</div><div><div class="td-name">Groceries</div></div></div></td><td>445</td><td><span class="badge badge-warning">Hidden</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Add / Edit Category</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Category Name</label><input type="text" placeholder="e.g. Phones & Tablets" /></div>
+            <div class="form-group"><label>Parent Category</label><select><option>— None (Top Level) —</option><option>Electronics</option><option>Fashion</option></select></div>
+            <div class="form-group"><label>Description</label><textarea placeholder="Brief description…"></textarea></div>
+            <div class="form-group"><label>Category Image</label>
+              <div class="upload-area"><div class="upload-icon">🖼️</div><div class="upload-text">Click to upload image</div><div class="upload-hint">PNG, JPG up to 2MB</div></div>
+            </div>
+            <div class="form-group"><label>Display Order</label><input type="number" value="1" /></div>
+            <div class="form-group">
+              <div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')">
+                <div class="toggle-track on"><div class="toggle-thumb"></div></div>
+                <span class="toggle-label">Active / Visible</span>
+              </div>
+            </div>
+            <button class="tb-btn primary" style="width:100%;padding:12px">Save Category</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNERS PAGE -->
+    <div class="admin-page" id="page-banners">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Homepage Banners</span></div>
+          <div class="card-body">
+            <div id="bannersList"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Add New Banner</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Banner Title</label><input type="text" placeholder="e.g. Mega Sale – Up to 50% Off" /></div>
+            <div class="form-group"><label>Subtitle / Description</label><input type="text" placeholder="Brief banner description" /></div>
+            <div class="form-group"><label>CTA Button Text</label><input type="text" placeholder="e.g. Shop Now" /></div>
+            <div class="form-group"><label>Link URL</label><input type="text" placeholder="/products?sale=true" /></div>
+            <div class="form-group"><label>Banner Image</label><div class="upload-area"><div class="upload-icon">🖼️</div><div class="upload-text">Upload banner image</div><div class="upload-hint">Recommended: 1200×450px</div></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>Start Date</label><input type="text" placeholder="YYYY-MM-DD" /></div>
+              <div class="form-group"><label>End Date</label><input type="text" placeholder="YYYY-MM-DD (optional)" /></div>
+            </div>
+            <div class="form-group"><label>Position</label><select><option>Hero Slider</option><option>Side Card Left</option><option>Side Card Right</option><option>Full Width Banner</option></select></div>
+            <button class="tb-btn primary" style="width:100%;padding:12px">Publish Banner</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS PAGE -->
+    <div class="admin-page" id="page-payments">
+      <div class="three-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🟢 Paystack</span><span class="badge badge-success">Active</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Public Key</label><input type="text" value="pk_live_••••••••••••••" /></div>
+            <div class="form-group"><label>Secret Key</label><input type="text" value="xxxxx••••••••••••••" /></div>
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Enabled</span></div></div>
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Test Mode</span></div></div>
+            <button class="tb-btn primary" style="width:100%;padding:10px">Save Paystack Settings</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🟡 Flutterwave</span><span class="badge badge-warning">Inactive</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Public Key</label><input type="text" placeholder="FLWPUBK_TEST-..." /></div>
+            <div class="form-group"><label>Secret Key</label><input type="text" placeholder="FLWSECK_TEST-..." /></div>
+            <div class="form-group"><label>Encryption Key</label><input type="text" placeholder="Encryption key" /></div>
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track"><div class="toggle-thumb"></div></div><span class="toggle-label">Enable Flutterwave</span></div></div>
+            <button class="tb-btn primary" style="width:100%;padding:10px">Save Flutterwave</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🏦 Bank Transfer</span><span class="badge badge-success">Active</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Bank Name</label><input type="text" value="First Bank Nigeria" /></div>
+            <div class="form-group"><label>Account Number</label><input type="text" value="3012345678" /></div>
+            <div class="form-group"><label>Account Name</label><input type="text" value="Ecove Nigeria Ltd" /></div>
+            <div class="form-group"><label>Instructions</label><textarea placeholder="Payment instructions for customers…">Send payment to the account above and upload proof of payment in your order page.</textarea></div>
+            <button class="tb-btn primary" style="width:100%;padding:10px">Save Bank Details</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO PAGE -->
+    <div class="admin-page" id="page-seo">
+      <div class="tabs">
+        <div class="tab active">Homepage SEO</div>
+        <div class="tab">Category Pages</div>
+        <div class="tab">Product Pages</div>
+        <div class="tab">Global SEO</div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Homepage Meta Tags</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Page Title <span style="color:var(--muted);font-weight:400">(55-65 chars)</span></label><input type="text" value="Ecove – Nigeria's Online Marketplace | Shop Smart, Live Better" /></div>
+            <div class="form-group"><label>Meta Description <span style="color:var(--muted);font-weight:400">(150-160 chars)</span></label><textarea>Shop electronics, fashion, home appliances, phones, beauty products and more at the best prices in Nigeria. Fast delivery nationwide.</textarea></div>
+            <div class="form-group"><label>Focus Keywords</label><input type="text" value="online shopping Nigeria, buy electronics Nigeria, fashion Nigeria" /></div>
+            <div class="form-group"><label>OpenGraph Title</label><input type="text" value="Ecove – Nigeria's #1 Online Marketplace" /></div>
+            <div class="form-group"><label>OpenGraph Description</label><textarea>Shop from thousands of verified sellers across Nigeria. Electronics, Fashion, Home & More.</textarea></div>
+            <div class="form-group"><label>OG Image URL</label><input type="text" value="https://ecove.com.ng/og-image.jpg" /></div>
+            <div class="form-group"><label>Canonical URL</label><input type="text" value="https://ecove.com.ng/" /></div>
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Generate Sitemap Automatically</span></div></div>
+            <button class="tb-btn primary" style="padding:12px 28px">Save SEO Settings</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><span class="card-title">SEO Preview</span></div>
+            <div class="card-body">
+              <div style="border:1px solid var(--border);border-radius:8px;padding:16px">
+                <div style="font-size:12px;color:var(--primary-dark)">https://ecove.com.ng/</div>
+                <div style="font-size:18px;font-weight:600;color:#1a0dab;margin:4px 0">Ecove – Nigeria's Online Marketplace | Shop Smart, Live Better</div>
+                <div style="font-size:13px;color:var(--muted)">Shop electronics, fashion, home appliances, phones, beauty products and more at the best prices in Nigeria. Fast delivery nationwide.</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Schema Markup</span></div>
+            <div class="card-body">
+              <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Product Schema</span></div></div>
+              <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Breadcrumb Schema</span></div></div>
+              <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Organization Schema</span></div></div>
+              <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track"><div class="toggle-thumb"></div></div><span class="toggle-label">FAQ Schema</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUPONS PAGE -->
+    <div class="admin-page" id="page-coupons">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Active Coupons</span><button class="tb-btn primary" style="font-size:12px;padding:6px 14px">+ Create</button></div>
+          <table>
+            <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Used</th><th>Expires</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ECOVE20</strong></td><td>Percentage</td><td>20% off</td><td>142/500</td><td>Dec 31, 2025</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><strong>WELCOME5K</strong></td><td>Fixed</td><td>₦5,000 off</td><td>89/200</td><td>Mar 31, 2025</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><strong>FLASHSALE</strong></td><td>Percentage</td><td>40% off</td><td>500/500</td><td>Jan 15, 2025</td><td><span class="badge badge-danger">Expired</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+              <tr><td><strong>FREESHIP</strong></td><td>Free Shipping</td><td>—</td><td>234/1000</td><td>Jun 30, 2025</td><td><span class="badge badge-success">Active</span></td><td><button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Create Coupon</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Coupon Code</label><input type="text" placeholder="e.g. SAVE20 (auto-generate or custom)" /></div>
+            <div class="form-group"><label>Discount Type</label><select><option>Percentage Discount</option><option>Fixed Amount</option><option>Free Shipping</option><option>Buy X Get Y</option></select></div>
+            <div class="form-group"><label>Discount Value</label><div class="input-group"><span class="input-prefix">%</span><input type="number" placeholder="20" /></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>Min. Order (₦)</label><input type="number" placeholder="10000" /></div>
+              <div class="form-group"><label>Usage Limit</label><input type="number" placeholder="500" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Start Date</label><input type="text" placeholder="YYYY-MM-DD" /></div>
+              <div class="form-group"><label>Expiry Date</label><input type="text" placeholder="YYYY-MM-DD" /></div>
+            </div>
+            <div class="form-group"><label>Applies To</label><select><option>All Products</option><option>Specific Categories</option><option>Specific Products</option></select></div>
+            <button class="tb-btn primary" style="width:100%;padding:12px">Create Coupon</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE CHAT PAGE -->
+    <div class="admin-page" id="page-livechat">
+      <div class="three-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">💬 WhatsApp Chat</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>WhatsApp Number</label><input type="text" placeholder="+234 800 000 0000" /></div>
+            <div class="form-group"><label>Pre-filled Message</label><textarea placeholder="Hello! I need help with my order…"></textarea></div>
+            <div class="form-group"><label>Button Text</label><input type="text" value="Chat on WhatsApp" /></div>
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Show WhatsApp Button</span></div></div>
+            <button class="tb-btn primary" style="width:100%;padding:10px">Save</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔵 Tawk.to</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Property ID</label><input type="text" placeholder="Your Tawk.to Property ID" /></div>
+            <div class="form-group"><label>Widget ID</label><input type="text" placeholder="Your Widget ID" /></div>
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track"><div class="toggle-thumb"></div></div><span class="toggle-label">Enable Tawk.to</span></div></div>
+            <div class="form-group" style="margin-top:16px"><label>Paste Custom Script</label><textarea placeholder="Paste any live chat script here (Intercom, Crisp, etc.)"></textarea></div>
+            <button class="tb-btn primary" style="width:100%;padding:10px">Save Script</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚙️ Chat Settings</span></div>
+          <div class="card-body">
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Show on Mobile</span></div></div>
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Show on Desktop</span></div></div>
+            <div class="form-group"><label>Chat Position</label><select><option>Bottom Right</option><option>Bottom Left</option></select></div>
+            <div class="form-group"><label>Business Hours</label><input type="text" placeholder="Mon-Fri, 9am-6pm WAT" /></div>
+            <div class="form-group"><label>Offline Message</label><textarea placeholder="We're offline right now. Leave a message!"></textarea></div>
+            <button class="tb-btn primary" style="width:100%;padding:10px">Save Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS PAGE -->
+    <div class="admin-page" id="page-analytics">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon si-green">👀</div><div><div class="stat-label">Page Views (Today)</div><div class="stat-value">12,450</div><div class="stat-change up">↑ 8.3%</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-blue">🛒</div><div><div class="stat-label">Conversion Rate</div><div class="stat-value">3.2%</div><div class="stat-change up">↑ 0.4%</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-orange">⏱️</div><div><div class="stat-label">Avg. Session Time</div><div class="stat-value">4m 32s</div><div class="stat-change up">↑ 12s</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-purple">📱</div><div><div class="stat-label">Mobile Traffic</div><div class="stat-value">78%</div><div class="stat-change up">↑ 3%</div></div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Revenue Last 7 Days</span></div>
+          <div class="card-body">
+            <div class="chart-bars" id="analyticsChart"></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:8px;padding:0 4px"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Top Traffic Sources</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:500">Google Search</span><span style="font-size:13px;font-weight:700">44%</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="height:100%;width:44%;background:var(--primary);border-radius:4px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:500">Direct</span><span style="font-size:13px;font-weight:700">22%</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="height:100%;width:22%;background:var(--blue);border-radius:4px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:500">Social Media</span><span style="font-size:13px;font-weight:700">18%</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="height:100%;width:18%;background:var(--orange);border-radius:4px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:500">WhatsApp Referral</span><span style="font-size:13px;font-weight:700">11%</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="height:100%;width:11%;background:#25d366;border-radius:4px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:500">Email</span><span style="font-size:13px;font-weight:700">5%</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="height:100%;width:5%;background:var(--purple);border-radius:4px"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="admin-page" id="page-settings">
+      <div class="tabs">
+        <div class="tab active">General</div>
+        <div class="tab">Logo & Branding</div>
+        <div class="tab">Shipping</div>
+        <div class="tab">Notifications</div>
+        <div class="tab">Footer</div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Site Settings</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Site Name</label><input type="text" value="Ecove" /></div>
+            <div class="form-group"><label>Site Tagline</label><input type="text" value="Shop Smart, Live Better" /></div>
+            <div class="form-group"><label>Store Email</label><input type="email" value="hello@ecove.com.ng" /></div>
+            <div class="form-group"><label>Support Phone</label><input type="text" value="+234 800 ECO VE 1" /></div>
+            <div class="form-group"><label>Store Currency</label><select><option>Nigerian Naira (₦)</option><option>US Dollar ($)</option></select></div>
+            <div class="form-group"><label>Store Language</label><select><option>English</option></select></div>
+            <div class="form-group"><label>Store Address</label><textarea>Lagos, Nigeria</textarea></div>
+            <div class="form-group"><label>Logo</label><div class="upload-area"><div class="upload-icon">🖼️</div><div class="upload-text">Upload Logo</div><div class="upload-hint">SVG or PNG, transparent background</div></div></div>
+            <div class="form-group"><label>Favicon</label><div class="upload-area" style="padding:16px"><div class="upload-icon" style="font-size:24px">📌</div><div class="upload-hint">32×32px .ico or .png</div></div></div>
+            <div class="form-group"><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div><span class="toggle-label">Maintenance Mode</span></div></div>
+            <button class="tb-btn primary" style="padding:12px 28px">Save Settings</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><span class="card-title">Homepage Sections</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500">🔥 Flash Sales</span><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div></div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500">⭐ Featured Products</span><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div></div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500">🏆 Best Sellers</span><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div></div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500">✨ New Arrivals</span><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div></div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500">📧 Newsletter</span><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div></div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500">🎁 Promo Banners</span><div class="toggle" onclick="this.querySelector('.toggle-track').classList.toggle('on')"><div class="toggle-track on"><div class="toggle-thumb"></div></div></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Google Analytics</span></div>
+            <div class="card-body">
+              <div class="form-group"><label>Measurement ID</label><input type="text" placeholder="G-XXXXXXXXXX" /></div>
+              <div class="form-group"><label>Google Tag Manager</label><input type="text" placeholder="GTM-XXXXXXX" /></div>
+              <div class="form-group"><label>Facebook Pixel ID</label><input type="text" placeholder="1234567890" /></div>
+              <button class="tb-btn primary" style="width:100%;padding:10px">Save Tracking</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS PAGE -->
+    <div class="admin-page" id="page-customers">
+      <div class="card">
+        <div class="card-header"><span class="card-title">All Customers</span>
+          <div style="display:flex;gap:8px"><input type="text" placeholder="Search customers..." style="width:200px;padding:8px 12px;font-size:13px" /><button class="tb-btn outline">📥 Export</button></div>
+        </div>
+        <table>
+          <thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th>Orders</th><th>Total Spent</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="customersTableBody"></tbody>
+        </table>
+        <div style="padding:16px"><div class="pagination" id="customersPagination"></div></div>
+      </div>
+    </div>
+
+    <!-- CONTENT PAGE -->
+    <div class="admin-page" id="page-content">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Homepage Hero Text</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Slide 1 – Badge</label><input type="text" value="🔥 Hot Deal" /></div>
+            <div class="form-group"><label>Slide 1 – Headline</label><input type="text" value="Smartphones Up to 40% Off" /></div>
+            <div class="form-group"><label>Slide 1 – Subtext</label><input type="text" value="Premium brands at unbeatable prices." /></div>
+            <div class="form-group"><label>Slide 1 – CTA Text</label><input type="text" value="Shop Now" /></div>
+            <div class="form-group"><label>Slide 1 – CTA Link</label><input type="text" value="/category/phones" /></div>
+            <hr style="margin:16px 0;border-color:var(--border)"/>
+            <div class="form-group"><label>Slide 2 – Headline</label><input type="text" value="Fashion Week Mega Sale" /></div>
+            <div class="form-group"><label>Slide 2 – Subtext</label><input type="text" value="Discover the latest trends in Nigerian fashion." /></div>
+            <div class="form-group"><label>About Page Content</label><textarea>Ecove is Nigeria's trusted online marketplace…</textarea></div>
+            <button class="tb-btn primary" style="padding:12px 24px">Save Content</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Footer Content</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Footer About Text</label><textarea>Nigeria's trusted online marketplace. Shop electronics, fashion, home goods, beauty products and more.</textarea></div>
+            <div class="form-group"><label>Copyright Text</label><input type="text" value="© 2025 Ecove Nigeria Ltd. All rights reserved." /></div>
+            <div class="form-group"><label>Facebook URL</label><input type="text" placeholder="https://facebook.com/ecoveng" /></div>
+            <div class="form-group"><label>Twitter/X URL</label><input type="text" placeholder="https://x.com/ecoveng" /></div>
+            <div class="form-group"><label>Instagram URL</label><input type="text" placeholder="https://instagram.com/ecoveng" /></div>
+            <div class="form-group"><label>YouTube URL</label><input type="text" placeholder="https://youtube.com/@ecoveng" /></div>
+            <div class="form-group"><label>WhatsApp Business</label><input type="text" placeholder="+234 800 000 0000" /></div>
+            <button class="tb-btn primary" style="width:100%;padding:12px">Save Footer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+</div><!-- /main-content -->
+
+<script>
+const pages = {
+  dashboard: { title: 'Dashboard Overview', sub: "Welcome back! Here's what's happening today.", btn: '+ Add Product' },
+  orders: { title: 'Order Management', sub: 'View and manage all customer orders.', btn: '📥 Export Orders' },
+  products: { title: 'Product Management', sub: 'Manage your product catalog.', btn: '+ Add Product' },
+  categories: { title: 'Category Management', sub: 'Organize your store categories.', btn: '+ Add Category' },
+  customers: { title: 'Customer Management', sub: 'View registered customers.', btn: '📥 Export' },
+  banners: { title: 'Banner Management', sub: 'Manage homepage and promotional banners.', btn: '+ New Banner' },
+  coupons: { title: 'Coupon & Promotions', sub: 'Create discount codes and flash sales.', btn: '+ Create Coupon' },
+  content: { title: 'Content Management', sub: 'Edit website text and page content.', btn: '💾 Save All' },
+  payments: { title: 'Payment Settings', sub: 'Configure payment gateways.', btn: '💾 Save Settings' },
+  seo: { title: 'SEO Manager', sub: 'Optimize your store for search engines.', btn: '💾 Save SEO' },
+  livechat: { title: 'Live Chat Integration', sub: 'Set up customer support chat.', btn: '💾 Save' },
+  analytics: { title: 'Analytics & Reports', sub: 'Track your store performance.', btn: '📊 Full Report' },
+  settings: { title: 'Site Settings', sub: 'Configure your store settings.', btn: '💾 Save Settings' },
+};
+
+function showPage(id) {
+  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const info = pages[id] || {};
+  document.getElementById('pageTitle').textContent = info.title || id;
+  document.getElementById('pageSubtitle').textContent = info.sub || '';
+  document.getElementById('primaryActionBtn').textContent = info.btn || 'Action';
+  // Highlight nav
+  document.querySelectorAll('.nav-item').forEach(n => { if(n.textContent.toLowerCase().includes(id.slice(0,4))) n.classList.add('active'); });
+}
+function handlePrimaryAction() { alert('Action triggered!'); }
+
+// Chart bars
+const vals = [320000, 480000, 290000, 560000, 420000, 680000, 510000];
+const max = Math.max(...vals);
+['chartBars','analyticsChart'].forEach(id => {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = vals.map((v,i) => `<div class="bar-wrap"><div class="bar-val">₦${(v/1000).toFixed(0)}k</div><div class="bar" style="height:${(v/max)*100}%;background:${i===5?'var(--primary-dark)':'var(--primary)'}"></div></div>`).join('');
+});
+
+// Top Products
+const topProds = [
+  {icon:'📱',name:'Samsung Galaxy S24',sales:234,rev:'₦16.8M'},
+  {icon:'💻',name:'HP Pavilion 15',sales:189,rev:'₦10.2M'},
+  {icon:'👟',name:'Nike Air Max 270',sales:312,rev:'₦5.4M'},
+  {icon:'📺',name:'LG 55" 4K TV',sales:78,rev:'₦8.9M'},
+  {icon:'🍳',name:'Philips Air Fryer',sales:145,rev:'₦3.1M'},
+];
+document.getElementById('topProductsList').innerHTML = topProds.map((p,i) => `
+  <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5">
+    <span style="font-size:10px;font-weight:700;color:var(--muted);width:16px">${i+1}</span>
+    <div style="font-size:20px">${p.icon}</div>
+    <div style="flex:1"><div style="font-size:12px;font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--muted)">${p.sales} sold</div></div>
+    <div style="font-size:12px;font-weight:700;color:var(--green)">${p.rev}</div>
+  </div>`).join('');
+
+// Products Table
+const productData = [
+  {id:'ECO-001',icon:'📱',name:'Samsung Galaxy S24 Ultra',cat:'Phones',sku:'SAM-S24U',price:'₦950,000',stock:24,status:'In Stock'},
+  {id:'ECO-002',icon:'💻',name:'HP Pavilion 15 Core i5',cat:'Computing',sku:'HP-PAV15',price:'₦285,000',stock:8,status:'Low Stock'},
+  {id:'ECO-003',icon:'📺',name:'LG 55" 4K UHD Smart TV',cat:'Electronics',sku:'LG-55UHD',price:'₦480,000',stock:3,status:'Low Stock'},
+  {id:'ECO-004',icon:'👟',name:'Nike Air Max 270 Black',cat:'Fashion',sku:'NK-AM270',price:'₦45,000',stock:56,status:'In Stock'},
+  {id:'ECO-005',icon:'🍳',name:'Philips Air Fryer HD9252',cat:'Home',sku:'PH-AF9252',price:'₦38,000',stock:0,status:'Out of Stock'},
+  {id:'ECO-006',icon:'💄',name:'Neutrogena Skincare Set',cat:'Beauty',sku:'NG-SKIN',price:'₦12,500',stock:32,status:'In Stock'},
+];
+document.getElementById('productsTableBody').innerHTML = productData.map(p => `
+  <tr>
+    <td><div class="td-product"><div class="td-thumb">${p.icon}</div><div><div class="td-name">${p.name}</div><div class="td-cat">${p.sku}</div></div></div></td>
+    <td style="font-family:monospace;font-size:12px">${p.sku}</td>
+    <td>${p.cat}</td>
+    <td style="font-weight:700">${p.price}</td>
+    <td>${p.stock}</td>
+    <td><span class="badge ${p.status==='In Stock'?'badge-success':p.status==='Low Stock'?'badge-warning':'badge-danger'}">${p.status}</span></td>
+    <td><button class="action-btn action-view">👁</button> <button class="action-btn action-edit">✏️</button> <button class="action-btn action-delete">🗑️</button></td>
+  </tr>`).join('');
+
+// Orders Table
+const orderData = [
+  {id:'#ECO-4521',cust:'John Adebayo',date:'Mar 8, 2025',items:3,total:'₦145,000',pay:'Paystack',status:'Delivered'},
+  {id:'#ECO-4520',cust:'Amaka Okafor',date:'Mar 8, 2025',items:1,total:'₦32,500',pay:'Bank Transfer',status:'Shipped'},
+  {id:'#ECO-4519',cust:'Emeka Nwosu',date:'Mar 7, 2025',items:5,total:'₦78,000',pay:'Paystack',status:'Processing'},
+  {id:'#ECO-4518',cust:'Fatima Lawal',date:'Mar 7, 2025',items:2,total:'₦210,000',pay:'Flutterwave',status:'Delivered'},
+  {id:'#ECO-4517',cust:'Chidi Okeke',date:'Mar 6, 2025',items:1,total:'₦15,000',pay:'Paystack',status:'Pending'},
+  {id:'#ECO-4516',cust:'Ngozi Eze',date:'Mar 5, 2025',items:4,total:'₦124,000',pay:'Bank Transfer',status:'Cancelled'},
+];
+const statusBadge = {Delivered:'badge-success',Shipped:'badge-info',Processing:'badge-warning',Pending:'badge-warning',Cancelled:'badge-danger'};
+document.getElementById('ordersTableBody').innerHTML = orderData.map(o => `
+  <tr>
+    <td><strong>${o.id}</strong></td>
+    <td>${o.cust}</td><td>${o.date}</td><td>${o.items} items</td>
+    <td style="font-weight:700">${o.total}</td><td>${o.pay}</td>
+    <td><span class="badge ${statusBadge[o.status]}">${o.status}</span></td>
+    <td><button class="action-btn action-view">👁</button> <button class="action-btn action-edit">✏️</button></td>
+  </tr>`).join('');
+
+// Customers
+const customers = [
+  {name:'John Adebayo',email:'john@email.com',phone:'+234 801 234 5678',orders:12,spent:'₦580,000',joined:'Jan 2024',status:'Active'},
+  {name:'Amaka Okafor',email:'amaka@email.com',phone:'+234 802 345 6789',orders:5,spent:'₦142,000',joined:'Mar 2024',status:'Active'},
+  {name:'Emeka Nwosu',email:'emeka@email.com',phone:'+234 803 456 7890',orders:28,spent:'₦1,240,000',joined:'Sep 2023',status:'VIP'},
+  {name:'Fatima Lawal',email:'fatima@email.com',phone:'+234 804 567 8901',orders:3,spent:'₦75,000',joined:'Dec 2024',status:'Active'},
+  {name:'Chidi Okeke',email:'chidi@email.com',phone:'+234 805 678 9012',orders:1,spent:'₦15,000',joined:'Feb 2025',status:'New'},
+];
+document.getElementById('customersTableBody').innerHTML = customers.map(c => `
+  <tr>
+    <td><div class="td-product"><div style="width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary-dark);font-size:14px">${c.name[0]}</div><div><div class="td-name">${c.name}</div></div></div></td>
+    <td>${c.email}</td><td>${c.phone}</td><td>${c.orders}</td>
+    <td style="font-weight:700">${c.spent}</td><td>${c.joined}</td>
+    <td><span class="badge ${c.status==='VIP'?'badge-purple':c.status==='New'?'badge-info':'badge-success'}">${c.status}</span></td>
+    <td><button class="action-btn action-view">👁</button></td>
+  </tr>`).join('');
+
+// Banners
+const bannerData = [
+  {title:'Smartphones Flash Sale',sub:'Up to 40% off – Limited time',pos:'Hero Slider',status:'Active'},
+  {title:'Fashion Week Deals',sub:'New arrivals in fashion',pos:'Hero Slider',status:'Active'},
+  {title:'Electronics Clearance',sub:'Up to 60% off',pos:'Full Width',status:'Scheduled'},
+  {title:'Best Deals Card',sub:'Best Deals quick action card',pos:'Side Card',status:'Active'},
+];
+document.getElementById('bannersList').innerHTML = bannerData.map(b => `
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px">
+    <div>
+      <div style="font-size:13px;font-weight:700">${b.title}</div>
+      <div style="font-size:12px;color:var(--muted)">${b.sub}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">📍 ${b.pos}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="badge ${b.status==='Active'?'badge-success':'badge-info'}">${b.status}</span>
+      <button class="action-btn action-edit">✏️</button>
+      <button class="action-btn action-delete">🗑️</button>
+    </div>
+  </div>`).join('');
+
+// Pagination
+['productsPagination','ordersPagination','customersPagination'].forEach(id => {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = [1,2,3,'...',8,9].map((p,i) => `<div class="page-btn ${i===0?'active':''}">${p}</div>`).join('') + `<div style="margin-left:auto;font-size:12px;color:var(--muted)">Showing 1-10 of 50</div>`;
+});
+</script>
+</body>
+</html>
