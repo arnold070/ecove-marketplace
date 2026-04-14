@@ -40,7 +40,7 @@ export default function AdminCustomersPage() {
         c.phone || '',
         c._count?.orders || 0,
         c._sum?.total || 0,
-        c.isActive ? 'Active' : 'Suspended',
+        (c as any).isActive ? 'Active' : 'Suspended',
         new Date(c.createdAt).toLocaleDateString('en-NG'),
       ])
       const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
@@ -110,12 +110,12 @@ export default function AdminCustomersPage() {
                     </td>
                     <td className="px-5 py-4 text-xs text-gray-400">{new Date(c.createdAt).toLocaleDateString('en-NG')}</td>
                     <td className="px-5 py-4">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${c.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
-                        {c.isActive ? 'Active' : 'Suspended'}
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${(c as any).isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                        {(c as any).isActive ? 'Active' : 'Suspended'}
                       </span>
                     </td>
                     <td className="px-5 py-4">
-                      {c.isActive ? (
+                      {(c as any).isActive ? (
                         <button
                           onClick={() => { if (confirm(`Suspend ${c.firstName} ${c.lastName}?`)) toggleStatus.mutate({ id: c.id, action: 'deactivate' }) }}
                           className="text-xs px-2.5 py-1.5 rounded-lg font-semibold bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition-colors"

@@ -101,7 +101,7 @@ export default function VendorProductsPage() {
                           </div>
                         </td>
                         <td className="px-5 py-4 text-sm text-gray-500">{p.category?.name || '—'}</td>
-                        <td className="px-5 py-4 text-sm font-bold">₦{parseFloat(p.price).toLocaleString()}</td>
+                        <td className="px-5 py-4 text-sm font-bold">₦{typeof p.price === 'string' ? parseFloat(p.price) : p.price.toLocaleString()}</td>
                         <td className="px-5 py-4 text-sm" style={{ color: p.stock === 0 ? '#e53935' : p.stock < 5 ? '#f59e0b' : '#1e8a44', fontWeight: '600' }}>{p.stock}</td>
                         <td className="px-5 py-4 text-sm text-gray-600">{p._count?.orderItems || 0} sold</td>
                         <td className="px-5 py-4"><span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: s.bg, color: s.color }}>{p.status}</span></td>

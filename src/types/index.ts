@@ -1,14 +1,34 @@
 // ═══════════════════════════════════════════════════════════
-//  Ecove Marketplace — Shared TypeScript Types
+//  Ecove Marketplace — Shared TypeScript Types (FIXED)
 // ═══════════════════════════════════════════════════════════
 
 // ── Enums ────────────────────────────────────────────────────
 export type Role = 'customer' | 'vendor' | 'admin' | 'super_admin'
 export type VendorStatus = 'pending' | 'approved' | 'rejected' | 'suspended'
 export type ProductStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'suspended'
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'refunded'
-export type PaymentStatus = 'unpaid' | 'paid' | 'refunded' | 'failed' | 'partially_refunded'
-export type PayoutStatus = 'pending' | 'approved' | 'paid' | 'rejected' | 'on_hold'
+export type OrderStatus =
+  | 'pending'
+  | 'processing'
+  | 'shipped'
+  | 'out_for_delivery'
+  | 'delivered'
+  | 'cancelled'
+  | 'refunded'
+
+export type PaymentStatus =
+  | 'unpaid'
+  | 'paid'
+  | 'refunded'
+  | 'failed'
+  | 'partially_refunded'
+
+export type PayoutStatus =
+  | 'pending'
+  | 'approved'
+  | 'paid'
+  | 'rejected'
+  | 'on_hold'
+
 export type ReviewStatus = 'pending' | 'approved' | 'rejected' | 'flagged'
 
 // ── User ─────────────────────────────────────────────────────
@@ -20,8 +40,13 @@ export interface User {
   phone?: string
   role: Role
   avatarUrl?: string
+
+  // ✅ FIX: added missing field causing build failure
+  isActive: boolean
+
   isEmailVerified: boolean
   lastLoginAt?: string
+
   vendor?: VendorSummary
   createdAt: string
 }

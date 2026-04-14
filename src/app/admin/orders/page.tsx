@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/apiClient'
+import { formatCurrency } from '@/lib/format'
 import type { Order } from '@/types'
 import Link from 'next/link'
 
@@ -85,7 +86,7 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="px-5 py-4 text-xs text-orange-600 font-semibold max-w-[140px]">{vendors.slice(0, 2).join(', ')}{vendors.length > 2 ? ` +${vendors.length - 2}` : ''}</td>
                       <td className="px-5 py-4 text-sm text-gray-500">{o.items?.length || 0} item{o.items?.length !== 1 ? 's' : ''}</td>
-                      <td className="px-5 py-4 font-bold text-sm">₦{parseFloat(o.total).toLocaleString()}</td>
+                      <td className="px-5 py-4 font-bold text-sm">{formatCurrency(o.total)}</td>
                       <td className="px-5 py-4">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${o.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                           {o.paymentStatus}

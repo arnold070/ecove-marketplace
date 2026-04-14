@@ -151,7 +151,7 @@ export default function VendorDashboard() {
                 <div key={p.id} className="px-5 py-3 flex justify-between items-center text-sm">
                   <div className="font-semibold truncate max-w-[200px]">{p.name}</div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="font-bold">₦{parseFloat(p.price).toLocaleString()}</span>
+                    <span className="font-bold">₦{typeof p.price === 'string' ? parseFloat(p.price) : p.price.toLocaleString()}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
                       style={statusColors[p.status] || { background: '#f3f4f6', color: '#374151' }}>
                       {p.status}

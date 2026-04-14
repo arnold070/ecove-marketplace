@@ -1,59 +1,114 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   open: boolean
-  title: string
-  label: string
+  title?: string
+  label?: string
   placeholder?: string
   defaultValue?: string
+
+  onSubmit?: (value: string) => void
+  onClose?: () => void
+
+  // legacy support
+  onConfirm?: (value: string) => void
+  onCancel?: () => void
+
   confirmLabel?: string
   danger?: boolean
-  onConfirm: (value: string) => void
-  onCancel: () => void
 }
 
-export default function PromptModal({ open, title, label, placeholder, defaultValue = '', confirmLabel = 'Confirm', danger, onConfirm, onCancel }: Props) {
+export default function PromptModal({
+  open,
+  title = 'Enter value',
+  label,
+  placeholder = 'Type here...',
+  defaultValue = '',
+  onSubmit,
+  onClose,
+  onConfirm,
+  onCancel,
+  confirmLabel = 'Submit',
+  danger = false,
+}: Props) {
   const [value, setValue] = useState(defaultValue)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (open) { setValue(defaultValue); setTimeout(() => inputRef.current?.focus(), 50) }
+    if (open) {
+      setValue(defaultValue)
+      setTimeout(() => inputRef.current?.focus(), 50)
+    }
   }, [open, defaultValue])
 
   if (!open) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (value.trim()) onConfirm(value.trim())
+  // ✅ Close handler (backward compatible)
+  const handleClose = () => {
+    if (onClose) return onClose()
+    if (onCancel) return onCancel()
+  }
+
+  // ✅ Submit handler (safe + trimmed)
+  const handleSubmit = () => {
+    const trimmed = value.trim()
+    if (!trimmed) return
+
+    if (onSubmit) return onSubmit(trimmed)
+    if (onConfirm) return onConfirm(trimmed)
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onClick={onCancel}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-        <h3 className="font-extrabold text-gray-900 text-base mb-1">{title}</h3>
-        <form onSubmit={handleSubmit} className="mt-4">
-          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">{label}</label>
-          <input
-            ref={inputRef}
-            type="text"
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            placeholder={placeholder}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 mb-4"
-          />
-          <div className="flex gap-3 justify-end">
-            <button type="button" onClick={onCancel}
-              className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-              Cancel
-            </button>
-            <button type="submit" disabled={!value.trim()}
-              className="px-5 py-2.5 rounded-xl text-white text-sm font-bold disabled:opacity-40 transition-colors"
-              style={{ background: danger ? '#ef4444' : '#f68b1f' }}>
-              {confirmLabel}
-            </button>
-          </div>
-        </form>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={handleClose}
+    >
+      <div
+        className="bg-white rounded-xl p-6 w-full max-w-sm shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Title */}
+        <h3 className="font-bold mb-3 text-lg">{title}</h3>
+
+        {/* Label */}
+        {label && (
+          <p className="text-sm text-gray-500 mb-2">
+            {label}
+          </p>
+        )}
+
+        {/* Input */}
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder={placeholder}
+          className="w-full border rounded px-3 py-2 mb-4 outline-none focus:ring-2 focus:ring-orange-500"
+        />
+
+        {/* Actions */}
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={handleClose}
+            className="text-sm text-gray-500 hover:text-gray-700"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={handleSubmit}
+            disabled={!value.trim()}
+            className={`px-4 py-2 rounded text-sm text-white transition ${
+              danger
+                ? 'bg-red-500 hover:bg-red-600'
+                : 'bg-orange-500 hover:bg-orange-600'
+            } ${!value.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {confirmLabel}
+          </button>
+        </div>
       </div>
     </div>
   )

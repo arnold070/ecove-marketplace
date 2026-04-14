@@ -1,30 +1,33 @@
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import VendorStoreClient from './VendorStoreClient'
 
-interface Props { params: { slug: string } }
-
-async function getData(slug: string) {
-  try {
-    const base = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const res = await fetch(`${base}/api/storefront/vendors/${slug}`, { next: { revalidate: 300 } })
-    if (!res.ok) return null
-    const d = await res.json()
-    return d.data
-  } catch { return null }
+export const metadata: Metadata = {
+  title: 'Returns Policy – Ecove Marketplace',
+  description: 'Learn about Ecove returns, refunds, and exchange policy.',
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = await getData(params.slug)
-  if (!data) return { title: 'Store Not Found' }
-  return {
-    title: `${data.vendor.businessName} – Ecove Marketplace`,
-    description: data.vendor.description?.slice(0, 160) || `Shop from ${data.vendor.businessName} on Ecove`,
-  }
-}
+export default function ReturnsPage() {
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-10">
+      <h1 className="text-2xl font-extrabold mb-4">Returns Policy</h1>
 
-export default async function StorePage({ params }: Props) {
-  const data = await getData(params.slug)
-  if (!data) notFound()
-  return <VendorStoreClient data={data} />
+      <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
+        <p>
+          You can return eligible items within 7 days of delivery. Items must be unused,
+          in original packaging, and in resellable condition.
+        </p>
+
+        <p>
+          Refunds are processed after inspection and may take 3–7 business days.
+        </p>
+
+        <p>
+          Some items like digital products, perishable goods, and personal items are not eligible for returns.
+        </p>
+
+        <p>
+          For issues, contact support through your dashboard or email.
+        </p>
+      </div>
+    </div>
+  )
 }

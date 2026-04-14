@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image' // ✅ ADD THIS LINE
 import { useQuery } from '@tanstack/react-query'
 import { useCart } from '@/hooks/useCart'
 import { useAuth } from '@/context/AuthContext'

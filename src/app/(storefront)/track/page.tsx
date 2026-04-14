@@ -1,6 +1,7 @@
 'use client'
 import Image from 'next/image'
-import { useState, Suspense } from 'react'
+import React, { useState } from 'react'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import api from '@/lib/apiClient'
 import Link from 'next/link'

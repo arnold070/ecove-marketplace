@@ -9,18 +9,96 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role { customer vendor admin super_admin }
-enum VendorStatus { pending approved rejected suspended }
-enum ProductStatus { draft pending approved rejected suspended }
-enum OrderStatus { pending processing shipped out_for_delivery delivered cancelled refunded }
-enum PaymentStatus { unpaid paid refunded failed partially_refunded }
-enum PayoutStatus { pending approved paid rejected on_hold }
-enum CommissionType { global category vendor }
-enum CouponType { percentage fixed free_shipping buy_x_get_y }
-enum BannerPosition { hero_slider side_card_left side_card_right full_width dual_banner }
-enum ReviewStatus { pending approved rejected flagged }
-enum NotificationType { vendor_approved vendor_rejected vendor_suspended product_approved product_rejected order_received order_shipped order_delivered payout_approved payout_paid payout_rejected review_flagged }
+enum Role {
+  customer
+  vendor
+  admin
+  super_admin
+}
 
+enum VendorStatus {
+  pending
+  approved
+  rejected
+  suspended
+}
+
+enum ProductStatus {
+  draft
+  pending
+  approved
+  rejected
+  suspended
+}
+
+enum OrderStatus {
+  pending
+  processing
+  shipped
+  out_for_delivery
+  delivered
+  cancelled
+  refunded
+}
+
+enum PaymentStatus {
+  unpaid
+  paid
+  refunded
+  failed
+  partially_refunded
+}
+
+enum PayoutStatus {
+  pending
+  approved
+  paid
+  rejected
+  on_hold
+}
+
+enum CommissionType {
+  global
+  category
+  vendor
+}
+
+enum CouponType {
+  percentage
+  fixed
+  free_shipping
+  buy_x_get_y
+}
+
+enum BannerPosition {
+  hero_slider
+  side_card_left
+  side_card_right
+  full_width
+  dual_banner
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+  flagged
+}
+
+enum NotificationType {
+  vendor_approved
+  vendor_rejected
+  vendor_suspended
+  product_approved
+  product_rejected
+  order_received
+  order_shipped
+  order_delivered
+  payout_approved
+  payout_paid
+  payout_rejected
+  review_flagged
+}
 model User {
   id                 String    @id @default(uuid())
   email              String    @unique

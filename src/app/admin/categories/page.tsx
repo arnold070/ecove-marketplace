@@ -43,7 +43,7 @@ export default function AdminCategoriesPage() {
 
   const openEdit = (c: Category) => {
     setEditing(c); setShowForm(true)
-    reset({ name: c.name, description: c.description || '', displayOrder: c.displayOrder, isActive: c.isActive, metaTitle: c.metaTitle || '', metaDescription: c.metaDescription || '' })
+    reset({ name: c.name, description: c.description || '', displayOrder: c.displayOrder, isActive: (c as any).isActive, metaTitle: c.metaTitle || '', metaDescription: c.metaDescription || '' })
   }
 
   return (
@@ -118,8 +118,8 @@ export default function AdminCategoriesPage() {
                     <td className="px-5 py-4 text-sm font-semibold">{c._count?.products || 0}</td>
                     <td className="px-5 py-4 text-sm text-gray-500">{c.displayOrder}</td>
                     <td className="px-5 py-4">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${c.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                        {c.isActive ? 'Active' : 'Hidden'}
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${(c as any).isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {(c as any).isActive ? 'Active' : 'Hidden'}
                       </span>
                     </td>
                     <td className="px-5 py-4">

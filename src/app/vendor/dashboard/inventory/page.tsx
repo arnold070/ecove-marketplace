@@ -102,7 +102,7 @@ export default function VendorInventoryPage() {
                         </div>
                       </td>
                       <td className="px-5 py-3 text-xs text-gray-400 font-mono">{p.sku || '—'}</td>
-                      <td className="px-5 py-3 text-sm font-bold">₦{parseFloat(p.price).toLocaleString()}</td>
+                      <td className="px-5 py-3 text-sm font-bold">₦{typeof p.price === 'string' ? parseFloat(p.price) : p.price.toLocaleString()}</td>
                       <td className="px-5 py-3">
                         <span className="text-sm font-extrabold" style={{ color: stockColor }}>{stockVal}</span>
                         {stockVal === 0 && <span className="ml-2 text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded">OOS</span>}

@@ -43,7 +43,9 @@ export default async function ProductPage({ params }: Props) {
       '@type': 'Offer',
       url: `${baseUrl}/products/${product.slug}`,
       priceCurrency: 'NGN',
-      price: parseFloat(product.price),
+      price: typeof product.price === 'string'
+  ? parseFloat(product.price)
+  : product.price,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       seller: { '@type': 'Organization', name: product.vendor?.businessName },

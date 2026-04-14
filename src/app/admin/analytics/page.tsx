@@ -1,4 +1,6 @@
 'use client'
+
+import { formatCurrency } from '@/lib/format'
 import type { AdminAnalytics } from '@/types'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/apiClient'
@@ -133,7 +135,7 @@ export default function AdminAnalyticsPage() {
                 <span className="text-xs text-gray-400 ml-2">{o.user ? `${o.user.firstName} ${o.user.lastName}` : 'Guest'}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-bold">₦{parseFloat(o.total).toLocaleString()}</span>
+                <span className="text-sm font-bold">{formatCurrency(o.total)}</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: o.status === 'delivered' ? '#dcfce7' : '#fef3c7', color: o.status === 'delivered' ? '#15803d' : '#92400e' }}>{o.status}</span>
               </div>
             </div>

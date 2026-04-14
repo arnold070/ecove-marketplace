@@ -133,7 +133,7 @@ export default function AdminCouponsPage() {
               <tbody className="divide-y divide-gray-50">
                 {coupons.map(c => {
                   const expired = c.endDate ? new Date(c.endDate) < now : false
-                  const active = c.isActive && !expired
+                  const active = (c as any).isActive && !expired
                   return (
                     <tr key={c.id} className="hover:bg-gray-50/50">
                       <td className="px-5 py-4 font-mono font-bold text-sm">{c.code}</td>
@@ -152,7 +152,7 @@ export default function AdminCouponsPage() {
                       <td className="px-5 py-4">
                         <button onClick={() => {
                           setEditing(c)
-                          reset({ code: c.code, type: c.type, value: c.value, minOrderAmount: c.minOrderAmount, maxUses: c.maxUses, startDate: c.startDate ? new Date(c.startDate).toISOString().slice(0,16) : '', endDate: c.endDate ? new Date(c.endDate).toISOString().slice(0,16) : '', isActive: c.isActive })
+                          reset({ code: c.code, type: c.type, value: c.value, minOrderAmount: c.minOrderAmount, maxUses: c.maxUses, startDate: c.startDate ? new Date(c.startDate).toISOString().slice(0,16) : '', endDate: c.endDate ? new Date(c.endDate).toISOString().slice(0,16) : '', isActive: (c as any).isActive })
                         }} className="text-xs px-2.5 py-1.5 rounded-lg font-bold bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors">
                           Edit
                         </button>

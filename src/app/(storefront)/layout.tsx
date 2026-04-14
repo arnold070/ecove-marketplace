@@ -139,7 +139,7 @@ function Header() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-800 truncate">{p.name}</p>
-                        <p className="text-orange-600 font-bold text-xs">₦{parseFloat(p.price).toLocaleString()}</p>
+                        <p className="text-orange-600 font-bold text-xs">₦{typeof p.price === 'string' ? parseFloat(p.price) : p.price.toLocaleString()}</p>
                       </div>
                     </button>
                   ))}
