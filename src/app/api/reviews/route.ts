@@ -3,6 +3,7 @@ import { z } from 'zod'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { ok, created, apiError, handleError, getPagination } from '@/lib/api'
+import { rateLimit } from '@/lib/rateLimit'
 
 const createSchema = z.object({
   productId: z.string(),

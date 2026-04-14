@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: false, status: data.data?.status || 'unknown' })
   } catch (err) {
-    logger.error('[Paystack verify]', err)
+    logger.error({ err }, '[Paystack verify]')
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 })
   }
 }

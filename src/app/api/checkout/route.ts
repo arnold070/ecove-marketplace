@@ -6,6 +6,7 @@ import { getAuthUser } from '@/lib/auth'
 import { created, apiError, handleError } from '@/lib/api'
 import { calcCommission } from '@/lib/commission'
 import { generateOrderNumber } from '@/lib/utils'
+import { rateLimit } from '@/lib/rateLimit'
 import { Decimal } from '@prisma/client/runtime/library'
 
 // Maximum execution time (seconds) — important for Vercel Pro users

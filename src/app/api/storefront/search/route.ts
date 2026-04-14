@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
     if (vendorSlug) where.vendor      = { slug: vendorSlug }
 
     // ── Sort ─────────────────────────────────────────────────
-    const orderBy: Record<string, string>[] =
+    const orderBy: NonNullable<Parameters<typeof prisma.product.findMany>[0]>['orderBy'] =
       sort === 'price_asc'   ? [{ price: 'asc' }]  :
       sort === 'price_desc'  ? [{ price: 'desc' }] :
       sort === 'newest'      ? [{ createdAt: 'desc' }] :
@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
-        where: where as Parameters<typeof prisma.product.findMany>[0]['where'],
+        where: where as NonNullable<Parameters<typeof prisma.product.findMany>[0]>['where'],
         skip,
         take: limit,
         orderBy,
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
           _count:   { select: { reviews: true } },
         },
       }),
-      prisma.product.count({ where: where as Parameters<typeof prisma.product.count>[0]['where'] }),
+      prisma.product.count({ where: where as NonNullable<Parameters<typeof prisma.product.count>[0]>['where'] }),
     ])
 
     const totalPages = Math.ceil(total / limit)

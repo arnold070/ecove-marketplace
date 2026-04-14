@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import { ok, apiError, handleError } from '@/lib/api'
 import { uploadImage, deleteImage } from '@/lib/cloudinary'
+import { rateLimit } from '@/lib/rateLimit'
 import { z } from 'zod'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']

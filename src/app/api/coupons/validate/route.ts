@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import prisma from '@/lib/prisma'
 import { ok, apiError, handleError } from '@/lib/api'
+import { rateLimit } from '@/lib/rateLimit'
 
 const schema = z.object({
   code: z.string().min(1),

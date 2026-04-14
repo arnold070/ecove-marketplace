@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/context/AuthContext'
 import api from '@/lib/apiClient'
+import { formatCurrency } from '@/lib/format'
 import type { Order, Vendor, AdminAnalytics } from '@/types'
 import Link from 'next/link'
 
@@ -99,7 +100,7 @@ export default function AdminDashboard() {
                         <span className="text-gray-400 ml-2 text-xs">{o.user?.firstName} {o.user?.lastName}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-bold text-gray-800">₦{parseFloat(o.total).toLocaleString()}</span>
+                        <span className="font-bold text-gray-800">{formatCurrency(o.total)}</span>
                         <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
                           style={{ background: o.status === 'delivered' ? '#dcfce7' : '#fef3c7', color: o.status === 'delivered' ? '#15803d' : '#92400e' }}>
                           {o.status}
@@ -134,7 +135,7 @@ export default function AdminDashboard() {
                       <tr key={v.id} className="hover:bg-gray-50">
                         <td className="px-5 py-3 text-sm font-bold text-gray-400">{i + 1}</td>
                         <td className="px-5 py-3 text-sm font-semibold">{v.businessName}</td>
-                        <td className="px-5 py-3 text-sm font-bold" style={{ color: '#d4720e' }}>₦{parseFloat(v.totalSales).toLocaleString()}</td>
+                        <td className="px-5 py-3 text-sm font-bold" style={{ color: '#d4720e' }}>{formatCurrency(v.totalSales)}</td>
                         <td className="px-5 py-3 text-sm">{v.totalOrders}</td>
                         <td className="px-5 py-3 text-sm">⭐ {v.averageRating}</td>
                       </tr>
