@@ -45,5 +45,8 @@ module.exports = withSentryConfig(nextConfig, {
   transpileClientSDK: false,
   tunnelRoute: '/monitoring-tunnel',
   hideSourceMaps: true,
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
   reactComponentAnnotation: { enabled: true },
 })

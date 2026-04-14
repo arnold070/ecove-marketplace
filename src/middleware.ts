@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth'
+import { jwtVerify } from 'jose'
 
 // Routes that require authentication
 const PROTECTED: { pattern: RegExp; roles: string[]; redirect: string }[] = [
@@ -24,7 +24,7 @@ const PROTECTED_API = [
   /^\/api\/upload$/,
 ]
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   // ── API protection — return JSON 401 ────────────────────
@@ -53,8 +53,15 @@ export function middleware(req: NextRequest) {
     }
 
     try {
-      const payload = verifyToken(token)
-      if (!rule.roles.includes(payload.role)) {
+      const secret = process.env.JWT_SECRET
+      if (!secret) throw new Error('JWT_SECRET is not set')
+
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(secret), {
+        algorithms: ['HS256'],
+      })
+
+      const role = String(payload.role || '')
+      if (!rule.roles.includes(role)) {
         const url      = req.nextUrl.clone()
         url.pathname   = '/unauthorized'
         return NextResponse.redirect(url)

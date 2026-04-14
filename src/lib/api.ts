@@ -38,7 +38,9 @@ export function apiError(message: string, status = 400, details?: unknown) {
 }
 
 export function handleError(err: unknown) {
-  console.error('[API Error]', err)
+  if (process.env.ECOVE_BUILD !== '1') {
+    console.error('[API Error]', err)
+  }
 
   if (err instanceof AuthError) {
     return apiError(err.message, err.status)
@@ -56,8 +58,11 @@ export function handleError(err: unknown) {
 }
 
 export function getPagination(searchParams: URLSearchParams) {
-  const page  = Math.max(1, parseInt(searchParams.get('page')  || '1'))
-  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')))
+  const pageRaw = Number.parseInt(searchParams.get('page') || '1', 10)
+  const limitRaw = Number.parseInt(searchParams.get('limit') || '20', 10)
+
+  const page = Number.isFinite(pageRaw) ? Math.max(1, pageRaw) : 1
+  const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, limitRaw)) : 20
   const skip  = (page - 1) * limit
   return { page, limit, skip }
 }

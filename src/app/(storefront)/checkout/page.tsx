@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image' // ✅ ADD THIS LINE
 import { useQuery } from '@tanstack/react-query'
 import { useCart } from '@/hooks/useCart'
@@ -31,6 +31,11 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   const [emailUnverified, setEmailUnverified] = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
 
   const { data: savedAddresses } = useQuery({
     queryKey: ['my-addresses'],
@@ -51,10 +56,12 @@ export default function CheckoutPage() {
     }
   })
 
-  if (items.length === 0) {
-    router.replace('/cart')
-    return null
-  }
+  useEffect(() => {
+    if (!hasMounted) return
+    if (items.length === 0) router.replace('/cart')
+  }, [hasMounted, items.length, router])
+
+  if (!hasMounted || items.length === 0) return null
 
   const subtotal = totalPrice()
   const couponDiscount = couponData?.discountAmount || 0
