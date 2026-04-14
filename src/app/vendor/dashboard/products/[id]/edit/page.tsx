@@ -23,14 +23,14 @@ const schema = z.object({
     .positive()
     .optional()
     .or(z.nan())
-    .transform(v => (isNaN(v) ? undefined : v)),
+    .transform(v => (v === undefined || Number.isNaN(v) ? undefined : v)),
 
   comparePrice: z
     .number()
     .positive()
     .optional()
     .or(z.nan())
-    .transform(v => (isNaN(v) ? undefined : v)),
+    .transform(v => (v === undefined || Number.isNaN(v) ? undefined : v)),
 
   stock: z
     .number()
@@ -38,7 +38,7 @@ const schema = z.object({
     .min(0)
     .optional()
     .or(z.nan())
-    .transform(v => (isNaN(v) ? undefined : v)),
+    .transform(v => (v === undefined || Number.isNaN(v) ? undefined : v)),
 
   lowStockAlert: z
     .number()
@@ -46,7 +46,7 @@ const schema = z.object({
     .min(0)
     .optional()
     .or(z.nan())
-    .transform(v => (isNaN(v) ? undefined : v)),
+    .transform(v => (v === undefined || Number.isNaN(v) ? undefined : v)),
 
   categoryId: z.string().optional(),
   brand: z.string().optional(),

@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (err) {
-    logger.error('[Webhook Error]', err)
+    logger.error({ err }, '[Webhook Error]')
     // Always return 200 to Paystack so it stops retrying for non-signature errors
     return NextResponse.json({ received: true })
   }

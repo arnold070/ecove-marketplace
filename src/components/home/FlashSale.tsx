@@ -1,4 +1,8 @@
-export default function FlashSale() {
+type FlashSaleProps = {
+  products?: any
+}
+
+export default function FlashSale({ products }: FlashSaleProps) {
   return (
     <div className="bg-white rounded-xl p-6 border">
       <h2 className="text-lg font-bold">🔥 Flash Sale</h2>

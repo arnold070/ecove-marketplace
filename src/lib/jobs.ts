@@ -135,6 +135,7 @@ async function updateVendorRatings() {
 export function startBackgroundJobs() {
   // Only start once, and only on the server (not during build)
   if (started || typeof window !== 'undefined') return
+  if (process.env.NEXT_PHASE === 'phase-production-build') return
   if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_JOBS !== 'true') {
     logger.info('Background jobs disabled in development (set ENABLE_JOBS=true to enable)')
     return

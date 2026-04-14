@@ -9,6 +9,8 @@ import PromoBanners from '@/components/home/PromoBanners';
 import TrustStrip from '@/components/home/TrustStrip';
 import NewsletterSection from '@/components/home/NewsletterSection';
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Ecove – Nigeria's Online Marketplace | Shop Smart, Live Better",
   description:
@@ -21,21 +23,25 @@ export const metadata: Metadata = {
 };
 
 async function getHomepageData() {
+  const base =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+
   const [banners, categories, flashSaleProducts, featuredProducts, bestSellers] =
     await Promise.all([
-      fetch(`${process.env.API_URL}/api/banners?position=hero_slider&isActive=true`, {
+      fetch(`${base}/api/banners?position=hero_slider&isActive=true`, {
         next: { revalidate: 300 },
       }).then((r) => r.json()),
-      fetch(`${process.env.API_URL}/api/categories?isActive=true&limit=12`, {
+      fetch(`${base}/api/categories?isActive=true&limit=12`, {
         next: { revalidate: 600 },
       }).then((r) => r.json()),
-      fetch(`${process.env.API_URL}/api/products?flashSale=true&limit=8`, {
+      fetch(`${base}/api/products?flashSale=true&limit=8`, {
         next: { revalidate: 60 },
       }).then((r) => r.json()),
-      fetch(`${process.env.API_URL}/api/products?featured=true&limit=12`, {
+      fetch(`${base}/api/products?featured=true&limit=12`, {
         next: { revalidate: 300 },
       }).then((r) => r.json()),
-      fetch(`${process.env.API_URL}/api/products?bestSeller=true&limit=12`, {
+      fetch(`${base}/api/products?bestSeller=true&limit=12`, {
         next: { revalidate: 300 },
       }).then((r) => r.json()),
     ]);

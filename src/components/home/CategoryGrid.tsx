@@ -1,4 +1,8 @@
-export default function CategoryGrid() {
+type CategoryGridProps = {
+  categories?: any
+}
+
+export default function CategoryGrid({ categories }: CategoryGridProps) {
   return (
     <div className="mb-6">
       <h2 className="font-bold mb-2">Categories</h2>

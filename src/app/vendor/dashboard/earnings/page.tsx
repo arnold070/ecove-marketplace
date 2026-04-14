@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/apiClient'
+import { formatCurrency } from '@/lib/format'
 import type { Payout } from '@/types'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
@@ -161,7 +162,7 @@ export default function VendorEarningsPage() {
                   return (
                     <tr key={p.id} className="hover:bg-gray-50/50">
                       <td className="px-5 py-4 text-sm text-gray-600">{new Date(p.requestedAt).toLocaleDateString('en-NG')}</td>
-                      <td className="px-5 py-4 text-sm font-bold">₦{parseFloat(p.amount).toLocaleString()}</td>
+                      <td className="px-5 py-4 text-sm font-bold">{formatCurrency(p.amount)}</td>
                       <td className="px-5 py-4 text-xs text-gray-400">{new Date(p.periodStart).toLocaleDateString('en-NG')} – {new Date(p.periodEnd).toLocaleDateString('en-NG')}</td>
                       <td className="px-5 py-4 text-xs text-gray-600">{p.bankName}</td>
                       <td className="px-5 py-4"><span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: s.bg, color: s.color }}>{p.status}</span></td>

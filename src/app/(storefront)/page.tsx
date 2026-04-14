@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import HomepageClient from './HomepageClient'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Ecove – Nigeria's Online Marketplace | Shop Smart, Live Better",
   description: 'Shop electronics, fashion, home appliances, phones, beauty products and more at the best prices in Nigeria. Fast delivery nationwide.',

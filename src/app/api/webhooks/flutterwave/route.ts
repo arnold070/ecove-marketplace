@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (err) {
-    logger.error('[FLW Webhook Error]', err)
+    logger.error({ err }, '[FLW Webhook Error]')
     return NextResponse.json({ received: true })
   }
 }

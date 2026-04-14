@@ -1,5 +1,5 @@
 'use client'
-import type { Order, Product } from '@/types'
+import type { OrderItem } from '@/types'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/apiClient'
@@ -61,7 +61,7 @@ export default function VendorReportsPage() {
     if (type === 'Orders CSV') {
       downloadCsv(`orders-${dateStr}.csv`,
         ['Order #', 'Product', 'Qty', 'Unit Price', 'Earning', 'Commission', 'Status', 'Date'],
-        filtered.map((o: Order) => [
+        filtered.map((o: OrderItem) => [
           o.order?.orderNumber || '', o.productName, o.quantity,
           o.unitPrice, o.vendorEarning, o.commissionAmt,
           o.fulfillmentStatus, new Date(o.createdAt).toLocaleDateString('en-NG'),

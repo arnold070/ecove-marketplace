@@ -94,6 +94,7 @@ enum NotificationType {
   order_received
   order_shipped
   order_delivered
+  low_stock
   payout_approved
   payout_paid
   payout_rejected
@@ -119,6 +120,7 @@ model User {
   addresses          Address[]
   orders             Order[]
   reviews            Review[]
+  vendorReviews      VendorReview[]
   wishlist           WishlistItem[]
   notifications      Notification[]
   sessions           Session[]
@@ -411,6 +413,7 @@ model VendorReview {
   vendorId  String
   vendor    Vendor       @relation(fields: [vendorId], references: [id])
   userId    String?
+  user      User?        @relation(fields: [userId], references: [id])
   rating    Int
   body      String?
   delivery  Int?
